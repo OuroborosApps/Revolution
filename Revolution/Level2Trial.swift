@@ -9,51 +9,42 @@
 import Foundation
 import SpriteKit
 
-class level2 :SKScene {
+class level2Trial :SKScene {
     
     override init(size: CGSize) {
         super.init(size: size)
     }
-
+    
     required init?(coder aDecoder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
     }
     
     let sceneWidth:CGFloat = 1334
     let sceneHeight:CGFloat = 750
+    let maxTileWidth: CGFloat = 1334
+    let maxTileHeight: CGFloat = 750
+    let minTileWidth: CGFloat = 334
+    let minTileHeight: CGFloat = 188
+    let minScale: CGFloat = 0.75
+    let maxScale: CGFloat = 1.25
+    let numberOfTilesInRow: Int = 4
+    let numberOfTilesInColumn: Int = 4
+    
+    
     
     func handlePinchGesture(gesture: UIPinchGestureRecognizer){
+        
+        let BGNodeArray:Array = [bgTile1, bgTile2, bgTile3, bgTile4, bgTile5, bgTile6, bgTile7, bgTile8, bgTile9, bgTile10, bgTile11, bgTile12, bgTile13, bgTile14, bgTile15, bgTile16]
         
         // Finds the midpoint location of the pinch gesture
         var gesturePoint = gesture.locationInView(self.view)
         var touchedPoint = convertPointFromView(gesturePoint)
-        
-        
-        
-        
-        
+       
         if gesture.state == UIGestureRecognizerState.Began{
-            
-            //Finds the node at the midpoint
-            
-            //First finds all nodes at that point then searches for the one with 0 z position
             var centerNodeArray = nodesAtPoint(touchedPoint)
-            var centerNodeCounter = 0
-            while centerNodeCounter <= (centerNodeArray.count - 1) && centerNodeArray[centerNodeCounter].zPosition != 0 {
-                centerNodeCounter++
-            }
-            if centerNodeCounter > (centerNodeArray.count - 1) {
-                return
-            
-            }
-            else {
-                centerNode = centerNodeArray[centerNodeCounter] as? SKNode
-            }
-            
-            
+            var centerNode: SKNode = findCenterNode(centerNodeArray)!
         }
-        
-        
+
         //Error correction
         if centerNode!.name == nil {
             centerNode!.name = "bgTile6"
@@ -63,755 +54,83 @@ class level2 :SKScene {
         var xDisp = touchedPoint.x - centerNode!.position.x
         var yDisp = touchedPoint.y - centerNode!.position.y
         
+        //Correct the Zooming
+        limitZooming(bgTile1, gesture, maxTileWidth, minTileWidth, minScale, maxScale)
         
-        
-        //Limits the zoom out size
-        if bgTile1.size.width <= 334 && gesture.scale < 1 {
-            
-            gesture.scale = 1
-            
-        }
-        // limits the zoom in size
-        else if bgTile1.size.width >= 1334 && gesture.scale > 1 {
-            
-            gesture.scale = 1
-        }
-        
-        
-        //Correction if scaling gets too big
-        if gesture.scale < 0.75 {
-            gesture.scale = 0.75
-        }
-        else if gesture.scale > 1.25 {
-            gesture.scale = 1.25
-        }
-        
-        //Correction to prevent overshooting
-        if gesture.scale * bgTile1.size.width < 334 {
-            gesture.scale = 334 / bgTile1.size.width
-        }
-        else if gesture.scale * bgTile1.size.width > 1334 {
-            gesture.scale = 1334 / bgTile1.size.width
-        }
-        
-        
-        
-        
+
         
         //Scaling Functions for the background nodes (all the planet nodes need to be added)
-        bgTile1.size = CGSizeMake(bgTile1.size.width * gesture.scale, bgTile1.size.height * gesture.scale)
-        bgTile2.size = CGSizeMake(bgTile2.size.width * gesture.scale, bgTile2.size.height * gesture.scale)
-        bgTile3.size = CGSizeMake(bgTile3.size.width * gesture.scale, bgTile3.size.height * gesture.scale)
-        bgTile4.size = CGSizeMake(bgTile4.size.width * gesture.scale, bgTile4.size.height * gesture.scale)
-        bgTile5.size = CGSizeMake(bgTile5.size.width * gesture.scale, bgTile5.size.height * gesture.scale)
-        bgTile6.size = CGSizeMake(bgTile6.size.width * gesture.scale, bgTile6.size.height * gesture.scale)
-        bgTile7.size = CGSizeMake(bgTile7.size.width * gesture.scale, bgTile7.size.height * gesture.scale)
-        bgTile8.size = CGSizeMake(bgTile8.size.width * gesture.scale, bgTile8.size.height * gesture.scale)
-        bgTile9.size = CGSizeMake(bgTile9.size.width * gesture.scale, bgTile9.size.height * gesture.scale)
-        bgTile10.size = CGSizeMake(bgTile10.size.width * gesture.scale, bgTile10.size.height * gesture.scale)
-        bgTile11.size = CGSizeMake(bgTile11.size.width * gesture.scale, bgTile11.size.height * gesture.scale)
-        bgTile12.size = CGSizeMake(bgTile12.size.width * gesture.scale, bgTile12.size.height * gesture.scale)
-        bgTile13.size = CGSizeMake(bgTile13.size.width * gesture.scale, bgTile13.size.height * gesture.scale)
-        bgTile14.size = CGSizeMake(bgTile14.size.width * gesture.scale, bgTile14.size.height * gesture.scale)
-        bgTile15.size = CGSizeMake(bgTile15.size.width * gesture.scale, bgTile15.size.height * gesture.scale)
-        bgTile16.size = CGSizeMake(bgTile16.size.width * gesture.scale, bgTile16.size.height * gesture.scale)
+        
+        scaleBackgroundNodes(BGNodeArray, gesture)
+        
+        
         
         //Additional nodes present in the scene also need to be scaled below
         
         star1.size = CGSizeMake(star1.size.width * gesture.scale, star1.size.height * gesture.scale)
         
-       
-        var scaledXDisp = xDisp * gesture.scale
-        var scaledYDisp = yDisp * gesture.scale
+        
+        var scaledXDisp: CGFloat = xDisp * gesture.scale
+        var scaledYDisp: CGFloat = yDisp * gesture.scale
         
         
         //Failsafe : Corrects if the scale function overshoots the scaling for either zoom in or zoom out
-        if bgTile1.size.width < 334 {
-            
-            bgTile1.size = CGSizeMake(334, 188)
-            bgTile2.size = CGSizeMake(334, 188)
-            bgTile3.size = CGSizeMake(334, 188)
-            bgTile4.size = CGSizeMake(334, 188)
-            bgTile5.size = CGSizeMake(334, 188)
-            bgTile6.size = CGSizeMake(334, 188)
-            bgTile7.size = CGSizeMake(334, 188)
-            bgTile8.size = CGSizeMake(334, 188)
-            bgTile9.size = CGSizeMake(334, 188)
-            bgTile10.size = CGSizeMake(334, 188)
-            bgTile11.size = CGSizeMake(334, 188)
-            bgTile12.size = CGSizeMake(334, 188)
-            bgTile13.size = CGSizeMake(334, 188)
-            bgTile14.size = CGSizeMake(334, 188)
-            bgTile15.size = CGSizeMake(334, 188)
-            bgTile16.size = CGSizeMake(334, 188)
-        }
-        else if bgTile1.size.width > 1334 {
-            
-            bgTile1.size = CGSizeMake(1334, 750)
-            bgTile2.size = CGSizeMake(1334, 750)
-            bgTile3.size = CGSizeMake(1334, 750)
-            bgTile4.size = CGSizeMake(1334, 750)
-            bgTile5.size = CGSizeMake(1334, 750)
-            bgTile6.size = CGSizeMake(1334, 750)
-            bgTile7.size = CGSizeMake(1334, 750)
-            bgTile8.size = CGSizeMake(1334, 750)
-            bgTile9.size = CGSizeMake(1334, 750)
-            bgTile10.size = CGSizeMake(1334, 750)
-            bgTile11.size = CGSizeMake(1334, 750)
-            bgTile12.size = CGSizeMake(1334, 750)
-            bgTile13.size = CGSizeMake(1334, 750)
-            bgTile14.size = CGSizeMake(1334, 750)
-            bgTile15.size = CGSizeMake(1334, 750)
-            bgTile16.size = CGSizeMake(1334, 750)
-        }
+        failsafeZoom(BGNodeArray, minTileWidth, minTileHeight, maxTileWidth, maxTileHeight)
         
         
         
-        
-        // Creates cases for each node that is being zoomed into, to allow that node to be the center of the zooming. 
+        // Weird but only method I could think of for calling the function to center the zoom on a specific node !!! This will fail if the nodes are renamed!!!
         var centerNodeName = String(centerNode!.name!)
-        
-            switch centerNodeName {
-            
-            case "bgTile1":
-                
-               bgTile1.position.x = touchedPoint.x - scaledXDisp
-               bgTile1.position.y = touchedPoint.y - scaledYDisp
-                
-            bgTile2.position.x = bgTile1.position.x + bgTile1.size.width
-            bgTile2.position.y = bgTile1.position.y
-            bgTile3.position.x = bgTile2.position.x + bgTile2.size.width
-            bgTile3.position.y = bgTile1.position.y
-            bgTile4.position.x = bgTile3.position.x + bgTile3.size.width
-            bgTile4.position.y = bgTile1.position.y
-            bgTile5.position.x = bgTile1.position.x
-            bgTile5.position.y = bgTile1.position.y - bgTile1.size.height
-            bgTile6.position.x = bgTile2.position.x
-            bgTile6.position.y = bgTile5.position.y
-            bgTile7.position.x = bgTile3.position.x
-            bgTile7.position.y = bgTile5.position.y
-            bgTile8.position.x = bgTile4.position.x
-            bgTile8.position.y = bgTile5.position.y
-            bgTile9.position.x = bgTile5.position.x
-            bgTile9.position.y = bgTile5.position.y - bgTile5.size.height
-            bgTile10.position.x = bgTile6.position.x
-            bgTile10.position.y = bgTile9.position.y
-            bgTile11.position.x = bgTile7.position.x
-            bgTile11.position.y = bgTile9.position.y
-            bgTile12.position.x = bgTile8.position.x
-            bgTile12.position.y = bgTile9.position.y
-            bgTile13.position.x = bgTile9.position.x
-            bgTile13.position.y = bgTile9.position.y - bgTile9.size.height
-            bgTile14.position.x = bgTile10.position.x
-            bgTile14.position.y = bgTile13.position.y
-            bgTile15.position.x = bgTile11.position.x
-            bgTile15.position.y = bgTile13.position.y
-            bgTile16.position.x = bgTile12.position.x
-            bgTile16.position.y = bgTile13.position.y
-                
-            case "bgTile2":
-                
-               bgTile2.position.x = touchedPoint.x - scaledXDisp
-               bgTile2.position.y = touchedPoint.y - scaledYDisp
-                
-                bgTile1.position.x = bgTile2.position.x - bgTile2.size.width
-                bgTile1.position.y = bgTile2.position.y
-                bgTile3.position.x = bgTile2.position.x + bgTile2.size.width
-                bgTile3.position.y = bgTile1.position.y
-                bgTile4.position.x = bgTile3.position.x + bgTile3.size.width
-               bgTile4.position.y = bgTile1.position.y
-               bgTile5.position.x = bgTile1.position.x
-                bgTile5.position.y = bgTile1.position.y - bgTile1.size.height
-                bgTile6.position.x = bgTile2.position.x
-                bgTile6.position.y = bgTile5.position.y
-                bgTile7.position.x = bgTile3.position.x
-                bgTile7.position.y = bgTile5.position.y
-                bgTile8.position.x = bgTile4.position.x
-                bgTile8.position.y = bgTile5.position.y
-                bgTile9.position.x = bgTile5.position.x
-                bgTile9.position.y = bgTile5.position.y - bgTile5.size.height
-                bgTile10.position.x = bgTile6.position.x
-                bgTile10.position.y = bgTile9.position.y
-                bgTile11.position.x = bgTile7.position.x
-                bgTile11.position.y = bgTile9.position.y
-                bgTile12.position.x = bgTile8.position.x
-                bgTile12.position.y = bgTile9.position.y
-                bgTile13.position.x = bgTile9.position.x
-                bgTile13.position.y = bgTile9.position.y - bgTile9.size.height
-                bgTile14.position.x = bgTile10.position.x
-                bgTile14.position.y = bgTile13.position.y
-                bgTile15.position.x = bgTile11.position.x
-                bgTile15.position.y = bgTile13.position.y
-                bgTile16.position.x = bgTile12.position.x
-                bgTile16.position.y = bgTile13.position.y
-                
-            case "bgTile3":
-                
-              bgTile3.position.x = touchedPoint.x - scaledXDisp
-                bgTile3.position.y = touchedPoint.y - scaledYDisp
-                
-                bgTile2.position.x = bgTile3.position.x - bgTile3.size.width
-                bgTile2.position.y = bgTile3.position.y
-                bgTile1.position.x = bgTile2.position.x - bgTile2.size.width
-                bgTile1.position.y = bgTile2.position.y
-                bgTile4.position.x = bgTile3.position.x + bgTile3.size.width
-                bgTile4.position.y = bgTile1.position.y
-                bgTile5.position.x = bgTile1.position.x
-                bgTile5.position.y = bgTile1.position.y - bgTile1.size.height
-                bgTile6.position.x = bgTile2.position.x
-                bgTile6.position.y = bgTile5.position.y
-                bgTile7.position.x = bgTile3.position.x
-                bgTile7.position.y = bgTile5.position.y
-                bgTile8.position.x = bgTile4.position.x
-                bgTile8.position.y = bgTile5.position.y
-                bgTile9.position.x = bgTile5.position.x
-                bgTile9.position.y = bgTile5.position.y - bgTile5.size.height
-                bgTile10.position.x = bgTile6.position.x
-                bgTile10.position.y = bgTile9.position.y
-                bgTile11.position.x = bgTile7.position.x
-                bgTile11.position.y = bgTile9.position.y
-                bgTile12.position.x = bgTile8.position.x
-                bgTile12.position.y = bgTile9.position.y
-                bgTile13.position.x = bgTile9.position.x
-                bgTile13.position.y = bgTile9.position.y - bgTile9.size.height
-                bgTile14.position.x = bgTile10.position.x
-                bgTile14.position.y = bgTile13.position.y
-                bgTile15.position.x = bgTile11.position.x
-                bgTile15.position.y = bgTile13.position.y
-                bgTile16.position.x = bgTile12.position.x
-                bgTile16.position.y = bgTile13.position.y
-                
-            case "bgTile4":
-                
-               bgTile4.position.x = touchedPoint.x - scaledXDisp
-                bgTile4.position.y = touchedPoint.y - scaledYDisp
-                
-                bgTile3.position.x = bgTile4.position.x - bgTile4.size.width
-                bgTile3.position.y = bgTile4.position.y
-                bgTile2.position.x = bgTile3.position.x - bgTile3.size.width
-                bgTile2.position.y = bgTile4.position.y
-                bgTile1.position.x = bgTile2.position.x - bgTile2.size.width
-                bgTile1.position.y = bgTile4.position.y
-                bgTile5.position.x = bgTile1.position.x
-                bgTile5.position.y = bgTile1.position.y - bgTile1.size.height
-                bgTile6.position.x = bgTile2.position.x
-                bgTile6.position.y = bgTile5.position.y
-                bgTile7.position.x = bgTile3.position.x
-                bgTile7.position.y = bgTile5.position.y
-                bgTile8.position.x = bgTile4.position.x
-                bgTile8.position.y = bgTile5.position.y
-                bgTile9.position.x = bgTile5.position.x
-                bgTile9.position.y = bgTile5.position.y - bgTile5.size.height
-                bgTile10.position.x = bgTile6.position.x
-                bgTile10.position.y = bgTile9.position.y
-                bgTile11.position.x = bgTile7.position.x
-                bgTile11.position.y = bgTile9.position.y
-                bgTile12.position.x = bgTile8.position.x
-                bgTile12.position.y = bgTile9.position.y
-                bgTile13.position.x = bgTile9.position.x
-                bgTile13.position.y = bgTile9.position.y - bgTile9.size.height
-                bgTile14.position.x = bgTile10.position.x
-                bgTile14.position.y = bgTile13.position.y
-                bgTile15.position.x = bgTile11.position.x
-                bgTile15.position.y = bgTile13.position.y
-                bgTile16.position.x = bgTile12.position.x
-                bgTile16.position.y = bgTile13.position.y
-                
-            case "bgTile5":
-                
-                bgTile5.position.x = touchedPoint.x - scaledXDisp
-                bgTile5.position.y = touchedPoint.y - scaledYDisp
-                
-                bgTile1.position.x = bgTile5.position.x
-                bgTile1.position.y = bgTile5.position.y + bgTile5.size.height
-                bgTile2.position.x = bgTile1.position.x + bgTile1.size.width
-                bgTile2.position.y = bgTile1.position.y
-                bgTile3.position.x = bgTile2.position.x + bgTile2.size.width
-                bgTile3.position.y = bgTile1.position.y
-                bgTile4.position.x = bgTile3.position.x + bgTile3.size.width
-                bgTile4.position.y = bgTile1.position.y
-                bgTile6.position.x = bgTile2.position.x
-                bgTile6.position.y = bgTile5.position.y
-                bgTile7.position.x = bgTile3.position.x
-                bgTile7.position.y = bgTile5.position.y
-                bgTile8.position.x = bgTile4.position.x
-                bgTile8.position.y = bgTile5.position.y
-                bgTile9.position.x = bgTile5.position.x
-                bgTile9.position.y = bgTile5.position.y - bgTile5.size.height
-                bgTile10.position.x = bgTile6.position.x
-                bgTile10.position.y = bgTile9.position.y
-                bgTile11.position.x = bgTile7.position.x
-                bgTile11.position.y = bgTile9.position.y
-                bgTile12.position.x = bgTile8.position.x
-                bgTile12.position.y = bgTile9.position.y
-                bgTile13.position.x = bgTile9.position.x
-                bgTile13.position.y = bgTile9.position.y - bgTile9.size.height
-                bgTile14.position.x = bgTile10.position.x
-                bgTile14.position.y = bgTile13.position.y
-                bgTile15.position.x = bgTile11.position.x
-                bgTile15.position.y = bgTile13.position.y
-                bgTile16.position.x = bgTile12.position.x
-                bgTile16.position.y = bgTile13.position.y
-                
-            case "bgTile6":
-                
-                bgTile6.position.x = touchedPoint.x - scaledXDisp
-                bgTile6.position.y = touchedPoint.y - scaledYDisp
-                
-                bgTile1.position.x = bgTile6.position.x - bgTile6.size.width
-                bgTile1.position.y = bgTile6.position.y + bgTile6.size.height
-                bgTile2.position.x = bgTile6.position.x
-                bgTile2.position.y = bgTile1.position.y
-                bgTile3.position.x = bgTile2.position.x + bgTile2.size.width
-                bgTile3.position.y = bgTile1.position.y
-                bgTile4.position.x = bgTile3.position.x + bgTile3.size.width
-                bgTile4.position.y = bgTile1.position.y
-                bgTile5.position.x = bgTile1.position.x
-                bgTile5.position.y = bgTile6.position.y
-                bgTile7.position.x = bgTile3.position.x
-                bgTile7.position.y = bgTile5.position.y
-                bgTile8.position.x = bgTile4.position.x
-                bgTile8.position.y = bgTile5.position.y
-                bgTile9.position.x = bgTile5.position.x
-                bgTile9.position.y = bgTile5.position.y - bgTile5.size.height
-                bgTile10.position.x = bgTile6.position.x
-                bgTile10.position.y = bgTile9.position.y
-                bgTile11.position.x = bgTile7.position.x
-                bgTile11.position.y = bgTile9.position.y
-                bgTile12.position.x = bgTile8.position.x
-                bgTile12.position.y = bgTile9.position.y
-                bgTile13.position.x = bgTile9.position.x
-                bgTile13.position.y = bgTile9.position.y - bgTile9.size.height
-                bgTile14.position.x = bgTile10.position.x
-                bgTile14.position.y = bgTile13.position.y
-                bgTile15.position.x = bgTile11.position.x
-                bgTile15.position.y = bgTile13.position.y
-                bgTile16.position.x = bgTile12.position.x
-                bgTile16.position.y = bgTile13.position.y
-
-                
-                
-            case "bgTile7":
-                
-                bgTile7.position.x = touchedPoint.x - scaledXDisp
-                bgTile7.position.y = touchedPoint.y - scaledYDisp
-                
-                bgTile3.position.x = bgTile7.position.x
-                bgTile3.position.y = bgTile7.position.y + bgTile7.size.height
-                bgTile2.position.x = bgTile3.position.x - bgTile3.size.width
-                bgTile2.position.y = bgTile3.position.y
-                bgTile1.position.x = bgTile2.position.x - bgTile2.size.width
-                bgTile1.position.y = bgTile2.position.y
-                bgTile4.position.x = bgTile3.position.x + bgTile3.size.width
-                bgTile4.position.y = bgTile3.position.y
-                bgTile5.position.x = bgTile1.position.x
-                bgTile5.position.y = bgTile7.position.y
-                bgTile6.position.x = bgTile2.position.x
-                bgTile6.position.y = bgTile5.position.y
-                bgTile8.position.x = bgTile4.position.x
-                bgTile8.position.y = bgTile5.position.y
-                bgTile9.position.x = bgTile1.position.x
-                bgTile9.position.y = bgTile5.position.y - bgTile5.size.height
-                bgTile10.position.x = bgTile2.position.x
-                bgTile10.position.y = bgTile9.position.y
-                bgTile11.position.x = bgTile3.position.x
-                bgTile11.position.y = bgTile9.position.y
-                bgTile12.position.x = bgTile4.position.x
-                bgTile12.position.y = bgTile9.position.y
-                bgTile13.position.x = bgTile1.position.x
-                bgTile13.position.y = bgTile9.position.y - bgTile9.size.height
-                bgTile14.position.x = bgTile2.position.x
-                bgTile14.position.y = bgTile13.position.y
-                bgTile15.position.x = bgTile3.position.x
-                bgTile15.position.y = bgTile13.position.y
-                bgTile16.position.x = bgTile4.position.x
-                bgTile16.position.y = bgTile13.position.y
-                
-                
-            case "bgTile8":
-                
-                bgTile8.position.x = touchedPoint.x - scaledXDisp
-                bgTile8.position.y = touchedPoint.y - scaledYDisp
-                
-                bgTile4.position.x = bgTile8.position.x
-                bgTile4.position.y = bgTile8.position.y + bgTile8.size.height
-                bgTile3.position.x = bgTile4.position.x - bgTile4.size.width
-                bgTile3.position.y = bgTile4.position.y
-                bgTile2.position.x = bgTile3.position.x - bgTile3.size.width
-                bgTile2.position.y = bgTile3.position.y
-                bgTile1.position.x = bgTile2.position.x - bgTile2.size.width
-                bgTile5.position.x = bgTile1.position.x
-                bgTile5.position.y = bgTile8.position.y
-                bgTile6.position.x = bgTile2.position.x
-                bgTile6.position.y = bgTile5.position.y
-                bgTile7.position.x = bgTile3.position.x
-                bgTile7.position.y = bgTile5.position.y
-                bgTile9.position.x = bgTile1.position.x
-                bgTile9.position.y = bgTile8.position.y - bgTile8.size.height
-                bgTile10.position.x = bgTile2.position.x
-                bgTile10.position.y = bgTile9.position.y
-                bgTile11.position.x = bgTile3.position.x
-                bgTile11.position.y = bgTile9.position.y
-                bgTile12.position.x = bgTile4.position.x
-                bgTile12.position.y = bgTile9.position.y
-                bgTile13.position.x = bgTile1.position.x
-                bgTile13.position.y = bgTile9.position.y - bgTile9.size.height
-                bgTile14.position.x = bgTile2.position.x
-                bgTile14.position.y = bgTile13.position.y
-                bgTile15.position.x = bgTile3.position.x
-                bgTile15.position.y = bgTile13.position.y
-                bgTile16.position.x = bgTile4.position.x
-                bgTile16.position.y = bgTile13.position.y
-                
-                
-                
-                
-            case "bgTile9":
-                
-                bgTile9.position.x = touchedPoint.x - scaledXDisp
-                bgTile9.position.y = touchedPoint.y - scaledYDisp
-                
-                bgTile5.position.x = bgTile9.position.x
-                bgTile5.position.y = bgTile9.position.y + bgTile9.size.height
-                bgTile1.position.x = bgTile5.position.x
-                bgTile1.position.y = bgTile5.position.y + bgTile5.size.height
-                bgTile2.position.x = bgTile1.position.x + bgTile1.size.width
-                bgTile2.position.y = bgTile1.position.y
-                bgTile3.position.x = bgTile2.position.x + bgTile2.size.width
-                bgTile3.position.y = bgTile1.position.y
-                bgTile4.position.x = bgTile3.position.x + bgTile3.size.width
-                bgTile4.position.y = bgTile1.position.y
-                bgTile6.position.x = bgTile2.position.x
-                bgTile6.position.y = bgTile5.position.y
-                bgTile7.position.x = bgTile3.position.x
-                bgTile7.position.y = bgTile5.position.y
-                bgTile8.position.x = bgTile4.position.x
-                bgTile8.position.y = bgTile5.position.y
-                bgTile10.position.x = bgTile2.position.x
-                bgTile10.position.y = bgTile9.position.y
-                bgTile11.position.x = bgTile3.position.x
-                bgTile11.position.y = bgTile9.position.y
-                bgTile12.position.x = bgTile4.position.x
-                bgTile12.position.y = bgTile9.position.y
-                bgTile13.position.x = bgTile1.position.x
-                bgTile13.position.y = bgTile9.position.y - bgTile9.size.height
-                bgTile14.position.x = bgTile2.position.x
-                bgTile14.position.y = bgTile13.position.y
-                bgTile15.position.x = bgTile3.position.x
-                bgTile15.position.y = bgTile13.position.y
-                bgTile16.position.x = bgTile4.position.x
-                bgTile16.position.y = bgTile13.position.y
-                
-            case "bgTile10":
-                
-                bgTile10.position.x = touchedPoint.x - scaledXDisp
-                bgTile10.position.y = touchedPoint.y - scaledYDisp
-                
-                
-                bgTile6.position.x = bgTile10.position.x
-                bgTile6.position.y = bgTile10.position.y + bgTile10.size.height
-                bgTile2.position.x = bgTile6.position.x
-                bgTile2.position.y = bgTile6.position.y + bgTile6.size.height
-                bgTile1.position.x = bgTile2.position.x - bgTile2.size.width
-                bgTile1.position.y = bgTile2.position.y
-                bgTile3.position.x = bgTile2.position.x + bgTile2.size.width
-                bgTile3.position.y = bgTile1.position.y
-                bgTile4.position.x = bgTile3.position.x + bgTile3.size.width
-                bgTile4.position.y = bgTile1.position.y
-                bgTile5.position.x = bgTile1.position.x
-                bgTile5.position.y = bgTile6.position.y
-                bgTile7.position.x = bgTile3.position.x
-                bgTile7.position.y = bgTile5.position.y
-                bgTile8.position.x = bgTile4.position.x
-                bgTile8.position.y = bgTile5.position.y
-                bgTile9.position.x = bgTile1.position.x
-                bgTile9.position.y = bgTile5.position.y - bgTile5.size.height
-                bgTile11.position.x = bgTile3.position.x
-                bgTile11.position.y = bgTile9.position.y
-                bgTile12.position.x = bgTile4.position.x
-                bgTile12.position.y = bgTile9.position.y
-                bgTile13.position.x = bgTile1.position.x
-                bgTile13.position.y = bgTile9.position.y - bgTile9.size.height
-                bgTile14.position.x = bgTile2.position.x
-                bgTile14.position.y = bgTile13.position.y
-                bgTile15.position.x = bgTile3.position.x
-                bgTile15.position.y = bgTile13.position.y
-                bgTile16.position.x = bgTile4.position.x
-                bgTile16.position.y = bgTile13.position.y
-                
-            case "bgTile11":
-                
-                bgTile11.position.x = touchedPoint.x - scaledXDisp
-                bgTile11.position.y = touchedPoint.y - scaledYDisp
-                
-                bgTile7.position.x = bgTile11.position.x
-                bgTile7.position.y = bgTile11.position.y + bgTile11.size.height
-                bgTile3.position.x = bgTile7.position.x
-                bgTile3.position.y = bgTile7.position.y + bgTile7.size.height
-                bgTile2.position.x = bgTile3.position.x - bgTile3.size.width
-                bgTile2.position.y = bgTile3.position.y
-                bgTile1.position.x = bgTile2.position.x - bgTile2.size.width
-                bgTile1.position.y = bgTile2.position.y
-                bgTile4.position.x = bgTile3.position.x + bgTile3.size.width
-                bgTile4.position.y = bgTile1.position.y
-                bgTile5.position.x = bgTile1.position.x
-                bgTile5.position.y = bgTile7.position.y
-                bgTile6.position.x = bgTile2.position.x
-                bgTile6.position.y = bgTile5.position.y
-                bgTile8.position.x = bgTile4.position.x
-                bgTile8.position.y = bgTile5.position.y
-                bgTile9.position.x = bgTile1.position.x
-                bgTile9.position.y = bgTile11.position.y
-                bgTile10.position.x = bgTile2.position.x
-                bgTile10.position.y = bgTile9.position.y
-                bgTile12.position.x = bgTile4.position.x
-                bgTile12.position.y = bgTile9.position.y
-                bgTile13.position.x = bgTile1.position.x
-                bgTile13.position.y = bgTile9.position.y - bgTile9.size.height
-                bgTile14.position.x = bgTile2.position.x
-                bgTile14.position.y = bgTile13.position.y
-                bgTile15.position.x = bgTile3.position.x
-                bgTile15.position.y = bgTile13.position.y
-                bgTile16.position.x = bgTile4.position.x
-                bgTile16.position.y = bgTile13.position.y
-                
-            case "bgTile12":
-                
-                bgTile12.position.x = touchedPoint.x - scaledXDisp
-                bgTile12.position.y = touchedPoint.y - scaledYDisp
-                
-                bgTile8.position.x = bgTile12.position.x
-                bgTile8.position.y = bgTile12.position.y + bgTile12.size.height
-                bgTile4.position.x = bgTile4.position.x
-                bgTile4.position.y = bgTile8.position.y + bgTile8.size.height
-                bgTile3.position.x = bgTile4.position.x - bgTile3.size.width
-                bgTile3.position.y = bgTile4.position.y
-                bgTile2.position.x = bgTile3.position.x - bgTile3.size.width
-                bgTile2.position.y = bgTile3.position.y
-                bgTile1.position.x = bgTile2.position.x - bgTile2.size.width
-                bgTile1.position.y = bgTile2.position.y
-                bgTile5.position.x = bgTile1.position.x
-                bgTile5.position.y = bgTile8.position.y
-                bgTile6.position.x = bgTile2.position.x
-                bgTile6.position.y = bgTile5.position.y
-                bgTile7.position.x = bgTile3.position.x
-                bgTile7.position.y = bgTile5.position.y
-                bgTile9.position.x = bgTile1.position.x
-                bgTile9.position.y = bgTile12.position.y
-                bgTile10.position.x = bgTile2.position.x
-                bgTile10.position.y = bgTile9.position.y
-                bgTile11.position.x = bgTile3.position.x
-                bgTile11.position.y = bgTile9.position.y
-                bgTile13.position.x = bgTile1.position.x
-                bgTile13.position.y = bgTile12.position.y - bgTile12.size.height
-                bgTile14.position.x = bgTile2.position.x
-                bgTile14.position.y = bgTile13.position.y
-                bgTile15.position.x = bgTile3.position.x
-                bgTile15.position.y = bgTile13.position.y
-                bgTile16.position.x = bgTile4.position.x
-                bgTile16.position.y = bgTile13.position.y
-
-                
-            case "bgTile13":
-                
-                bgTile13.position.x = touchedPoint.x - scaledXDisp
-                bgTile13.position.y = touchedPoint.y - scaledYDisp
-                
-                bgTile9.position.x = bgTile13.position.x
-                bgTile9.position.y = bgTile13.position.y + bgTile13.size.height
-                bgTile5.position.x = bgTile9.position.x
-                bgTile5.position.y = bgTile9.position.y + bgTile9.size.height
-                bgTile1.position.x = bgTile5.position.x
-                bgTile1.position.y = bgTile5.position.y + bgTile5.size.height
-                bgTile2.position.x = bgTile1.position.x + bgTile1.size.width
-                bgTile2.position.y = bgTile1.position.y
-                bgTile3.position.x = bgTile2.position.x + bgTile2.size.width
-                bgTile3.position.y = bgTile1.position.y
-                bgTile4.position.x = bgTile3.position.x + bgTile3.size.width
-                bgTile6.position.x = bgTile2.position.x
-                bgTile6.position.y = bgTile5.position.y
-                bgTile7.position.x = bgTile3.position.x
-                bgTile7.position.y = bgTile5.position.y
-                bgTile8.position.x = bgTile4.position.x
-                bgTile8.position.y = bgTile5.position.y
-                bgTile10.position.x = bgTile2.position.x
-                bgTile10.position.y = bgTile9.position.y
-                bgTile11.position.x = bgTile3.position.x
-                bgTile11.position.y = bgTile9.position.y
-                bgTile12.position.x = bgTile4.position.x
-                bgTile12.position.y = bgTile9.position.y
-                bgTile14.position.x = bgTile2.position.x
-                bgTile14.position.y = bgTile13.position.y
-                bgTile15.position.x = bgTile3.position.x
-                bgTile15.position.y = bgTile13.position.y
-                bgTile16.position.x = bgTile4.position.x
-                bgTile16.position.y = bgTile13.position.y
-                
-                
-            case "bgTile14":
-                
-                bgTile14.position.x = touchedPoint.x - scaledXDisp
-                bgTile14.position.y = touchedPoint.y - scaledYDisp
-                
-                bgTile10.position.x = bgTile14.position.x
-                bgTile10.position.y = bgTile14.position.y + bgTile14.size.height
-                bgTile6.position.x = bgTile10.position.x
-                bgTile6.position.y = bgTile10.position.y + bgTile10.size.height
-                bgTile2.position.x = bgTile6.position.x
-                bgTile2.position.y = bgTile6.position.y + bgTile6.size.height
-                bgTile1.position.x = bgTile2.position.x - bgTile2.size.width
-                bgTile1.position.y = bgTile2.position.y
-                bgTile3.position.x = bgTile2.position.x + bgTile2.size.width
-                bgTile3.position.y = bgTile1.position.y
-                bgTile4.position.x = bgTile3.position.x + bgTile3.size.width
-                bgTile4.position.y = bgTile1.position.y
-                bgTile5.position.x = bgTile1.position.x
-                bgTile5.position.y = bgTile6.position.y
-                bgTile7.position.x = bgTile3.position.x
-                bgTile7.position.y = bgTile5.position.y
-                bgTile8.position.x = bgTile4.position.x
-                bgTile8.position.y = bgTile5.position.y
-                bgTile9.position.x = bgTile1.position.x
-                bgTile9.position.y = bgTile10.position.y
-                bgTile11.position.x = bgTile3.position.x
-                bgTile11.position.y = bgTile9.position.y
-                bgTile12.position.x = bgTile4.position.x
-                bgTile12.position.y = bgTile9.position.y
-                bgTile13.position.x = bgTile1.position.x
-                bgTile13.position.y = bgTile14.position.y
-                bgTile15.position.x = bgTile3.position.x
-                bgTile15.position.y = bgTile13.position.y
-                bgTile16.position.x = bgTile4.position.x
-                bgTile16.position.y = bgTile13.position.y
-                
-            case "bgTile15":
-                
-                bgTile15.position.x = touchedPoint.x - scaledXDisp
-                bgTile15.position.y = touchedPoint.y - scaledYDisp
-                
-                bgTile11.position.x = bgTile15.position.x
-                bgTile11.position.y = bgTile15.position.y + bgTile15.size.height
-                bgTile7.position.x = bgTile11.position.x
-                bgTile7.position.y = bgTile11.position.y + bgTile11.size.height
-                bgTile3.position.x = bgTile7.position.x
-                bgTile3.position.y = bgTile7.position.y + bgTile7.size.height
-                bgTile2.position.x = bgTile3.position.x - bgTile3.size.width
-                bgTile2.position.y = bgTile3.position.y
-                bgTile1.position.x = bgTile2.position.x - bgTile2.size.width
-                bgTile1.position.y = bgTile2.position.y
-                bgTile4.position.x = bgTile3.position.x + bgTile3.size.width
-                bgTile4.position.y = bgTile1.position.y
-                bgTile5.position.x = bgTile1.position.x
-                bgTile5.position.y = bgTile6.position.y
-                bgTile7.position.x = bgTile3.position.x
-                bgTile7.position.y = bgTile5.position.y
-                bgTile8.position.x = bgTile4.position.x
-                bgTile8.position.y = bgTile5.position.y
-                bgTile9.position.x = bgTile1.position.x
-                bgTile9.position.y = bgTile10.position.y
-                bgTile11.position.x = bgTile3.position.x
-                bgTile11.position.y = bgTile9.position.y
-                bgTile12.position.x = bgTile4.position.x
-                bgTile12.position.y = bgTile9.position.y
-                bgTile13.position.x = bgTile1.position.x
-                bgTile13.position.y = bgTile14.position.y
-                bgTile14.position.x = bgTile2.position.x
-                bgTile14.position.y = bgTile13.position.y
-                bgTile16.position.x = bgTile4.position.x
-                bgTile16.position.y = bgTile13.position.y
-                
-            
-            case "bgTile16":
-                
-                bgTile16.position.x = touchedPoint.x - scaledXDisp
-                bgTile16.position.y = touchedPoint.y - scaledYDisp
-                
-                bgTile12.position.x = bgTile16.position.x
-                bgTile12.position.y = bgTile16.position.y + bgTile16.size.height
-                bgTile8.position.x = bgTile12.position.x
-                bgTile8.position.y = bgTile12.position.y + bgTile12.size.height
-                bgTile4.position.x = bgTile8.position.x
-                bgTile4.position.y = bgTile8.position.y + bgTile8.size.height
-                bgTile3.position.x = bgTile4.position.x - bgTile4.size.width
-                bgTile3.position.y = bgTile4.position.y
-                bgTile2.position.x = bgTile3.position.x - bgTile3.size.width
-                bgTile2.position.y = bgTile3.position.y
-                bgTile1.position.x = bgTile2.position.x - bgTile2.size.width
-                bgTile5.position.x = bgTile1.position.x
-                bgTile5.position.y = bgTile8.position.y
-                bgTile6.position.x = bgTile2.position.x
-                bgTile6.position.y = bgTile5.position.y
-                bgTile7.position.x = bgTile3.position.x
-                bgTile7.position.y = bgTile5.position.y
-                bgTile9.position.x = bgTile1.position.x
-                bgTile9.position.y = bgTile12.position.y
-                bgTile10.position.x = bgTile2.position.x
-                bgTile10.position.y = bgTile9.position.y
-                bgTile11.position.x = bgTile3.position.x
-                bgTile11.position.y = bgTile9.position.y
-                bgTile13.position.x = bgTile1.position.x
-                bgTile13.position.y = bgTile16.position.y
-                bgTile14.position.x = bgTile2.position.x
-                bgTile14.position.y = bgTile13.position.y
-                bgTile15.position.x = bgTile3.position.x
-                bgTile15.position.y = bgTile13.position.y
-                
-                
-                
-                
-            default:
-                return
-            
-            
-            
-        }
+        var miscArray = centerNodeName.componentsSeparatedByString("e")
+        var selectedNode = miscArray[1].toInt()
+        zoomCenteredOnTile(selectedNode!, BGNodeArray, numberOfTilesInRow, numberOfTilesInColumn, touchedPoint, scaledXDisp, scaledYDisp)
         
         
         
         // If statements correcting for if the zoom would cause the nodes to zoom out of scene
         
         if bgTile1.position.x - bgTile1.size.width/2 > 0 {
-        
-        bgTile1.position.x = bgTile1.size.width/2
-        bgTile5.position.x = bgTile1.position.x
-        bgTile9.position.x = bgTile5.position.x
-        bgTile13.position.x = bgTile9.position.x
-        bgTile2.position.x = bgTile1.position.x + bgTile1.size.width
-        bgTile6.position.x = bgTile2.position.x
-        bgTile10.position.x = bgTile6.position.x
-        bgTile14.position.x = bgTile10.position.x
-        bgTile3.position.x = bgTile2.position.x + bgTile2.size.width
-        bgTile7.position.x = bgTile3.position.x
-        bgTile11.position.x = bgTile7.position.x
-        bgTile15.position.x = bgTile11.position.x
-        bgTile4.position.x = bgTile3.position.x + bgTile3.size.width
-        bgTile8.position.x = bgTile4.position.x
-        bgTile12.position.x = bgTile8.position.x
-        bgTile16.position.x = bgTile12.position.x
+            
+            bgTile1.position.x = bgTile1.size.width/2
+            bgTile5.position.x = bgTile1.position.x
+            bgTile9.position.x = bgTile5.position.x
+            bgTile13.position.x = bgTile9.position.x
+            bgTile2.position.x = bgTile1.position.x + bgTile1.size.width
+            bgTile6.position.x = bgTile2.position.x
+            bgTile10.position.x = bgTile6.position.x
+            bgTile14.position.x = bgTile10.position.x
+            bgTile3.position.x = bgTile2.position.x + bgTile2.size.width
+            bgTile7.position.x = bgTile3.position.x
+            bgTile11.position.x = bgTile7.position.x
+            bgTile15.position.x = bgTile11.position.x
+            bgTile4.position.x = bgTile3.position.x + bgTile3.size.width
+            bgTile8.position.x = bgTile4.position.x
+            bgTile12.position.x = bgTile8.position.x
+            bgTile16.position.x = bgTile12.position.x
         }
         
         if bgTile1.position.y + bgTile1.size.height/2 < sceneHeight {
-        
-        bgTile1.position.y = 750 - bgTile1.size.height/2
-        bgTile2.position.y = bgTile1.position.y
-        bgTile3.position.y = bgTile2.position.y
-        bgTile4.position.y = bgTile3.position.y
-        bgTile5.position.y = bgTile1.position.y - bgTile1.size.height
-        bgTile6.position.y = bgTile5.position.y
-        bgTile7.position.y = bgTile6.position.y
-        bgTile8.position.y = bgTile7.position.y
-        bgTile9.position.y = bgTile5.position.y - bgTile5.size.height
-        bgTile10.position.y = bgTile9.position.y
-        bgTile11.position.y = bgTile10.position.y
-        bgTile12.position.y = bgTile11.position.y
-        bgTile13.position.y = bgTile9.position.y - bgTile9.size.height
-        bgTile14.position.y = bgTile13.position.y
-        bgTile15.position.y = bgTile14.position.y
-        bgTile16.position.y = bgTile15.position.y
+            
+            bgTile1.position.y = 750 - bgTile1.size.height/2
+            bgTile2.position.y = bgTile1.position.y
+            bgTile3.position.y = bgTile2.position.y
+            bgTile4.position.y = bgTile3.position.y
+            bgTile5.position.y = bgTile1.position.y - bgTile1.size.height
+            bgTile6.position.y = bgTile5.position.y
+            bgTile7.position.y = bgTile6.position.y
+            bgTile8.position.y = bgTile7.position.y
+            bgTile9.position.y = bgTile5.position.y - bgTile5.size.height
+            bgTile10.position.y = bgTile9.position.y
+            bgTile11.position.y = bgTile10.position.y
+            bgTile12.position.y = bgTile11.position.y
+            bgTile13.position.y = bgTile9.position.y - bgTile9.size.height
+            bgTile14.position.y = bgTile13.position.y
+            bgTile15.position.y = bgTile14.position.y
+            bgTile16.position.y = bgTile15.position.y
         }
         
         if bgTile16.position.x + bgTile16.size.width/2 < sceneWidth {
-        
+            
             bgTile16.position.x = 1334 - bgTile16.size.width/2
             bgTile12.position.x = bgTile16.position.x
             bgTile8.position.x = bgTile12.position.x
@@ -829,11 +148,11 @@ class level2 :SKScene {
             bgTile5.position.x = bgTile9.position.x
             bgTile1.position.x = bgTile5.position.x
             
-        
+            
         }
         
         if bgTile16.position.y - bgTile16.size.height/2 > 0 {
-        
+            
             bgTile16.position.y = bgTile16.size.height/2
             bgTile15.position.y = bgTile16.position.y
             bgTile14.position.y = bgTile15.position.y
@@ -983,7 +302,7 @@ class level2 :SKScene {
             bgTile14.position = convertPointFromView(tempConvbgTile14pos)
             bgTile15.position = convertPointFromView(tempConvbgTile15pos)
             bgTile16.position = convertPointFromView(tempConvbgTile16pos)
-
+            
             
             if bgTile1.position.y - deltaPoint.y < self.size.height / 2 {
                 
@@ -1035,7 +354,7 @@ class level2 :SKScene {
         }
         
         
-
+        
     }
     
     
@@ -1084,7 +403,7 @@ class level2 :SKScene {
     var smallPosYMotion = true
     var largeNegYMotion = false
     var smallNegYMotion = true
-
+    
     struct PhysicsCategory {
         static let None : UInt32 = 0
         static let All : UInt32 = UInt32.max
@@ -1093,7 +412,7 @@ class level2 :SKScene {
         static let planet : UInt32 = 0b11
     }
     
-
+    
     
     override func didMoveToView(view: SKView) {
         
@@ -1189,7 +508,7 @@ class level2 :SKScene {
         bgTile15.physicsBody?.dynamic = false
         bgTile16.physicsBody?.dynamic = false
         
-
+        
         
         
         bgTile1.position = CGPointMake(-1334, 1500)
@@ -1208,7 +527,7 @@ class level2 :SKScene {
         bgTile14.position = CGPointMake(0, -750)
         bgTile15.position = CGPointMake(1334, -750)
         bgTile16.position = CGPointMake(2668, -750)
-
+        
         
         
         bgTile1.zPosition = 0
@@ -1329,7 +648,7 @@ class level2 :SKScene {
         
         
     }
-
+    
     
     override func touchesBegan(touches: Set<NSObject>, withEvent event: UIEvent) {
         
@@ -1355,10 +674,10 @@ class level2 :SKScene {
         }
         
     }
-
     
     
-
+    
+    
     override func update(currentTime: CFTimeInterval) {
         
         let decellerationConst:CGFloat = 7
@@ -1368,39 +687,39 @@ class level2 :SKScene {
         
         
         if bgTile1.physicsBody?.velocity.dx != 0 || bgTile1.physicsBody?.velocity.dy != 0 {
-        
-        bgTile2.position.x = bgTile1.position.x + bgTile1.size.width
-        bgTile2.position.y = bgTile1.position.y
-        bgTile3.position.x = bgTile2.position.x + bgTile2.size.width
-        bgTile3.position.y = bgTile1.position.y
-        bgTile4.position.x = bgTile3.position.x + bgTile3.size.width
-        bgTile4.position.y = bgTile1.position.y
-        bgTile5.position.x = bgTile1.position.x
-        bgTile5.position.y = bgTile1.position.y - bgTile1.size.height
-        bgTile6.position.x = bgTile2.position.x
-        bgTile6.position.y = bgTile5.position.y
-        bgTile7.position.x = bgTile3.position.x
-        bgTile7.position.y = bgTile5.position.y
-        bgTile8.position.x = bgTile4.position.x
-        bgTile8.position.y = bgTile5.position.y
-        bgTile9.position.x = bgTile5.position.x
-        bgTile9.position.y = bgTile5.position.y - bgTile5.size.height
-        bgTile10.position.x = bgTile6.position.x
-        bgTile10.position.y = bgTile9.position.y
-        bgTile11.position.x = bgTile7.position.x
-        bgTile11.position.y = bgTile9.position.y
-        bgTile12.position.x = bgTile8.position.x
-        bgTile12.position.y = bgTile9.position.y
-        bgTile13.position.x = bgTile9.position.x
-        bgTile13.position.y = bgTile9.position.y - bgTile9.size.height
-        bgTile14.position.x = bgTile10.position.x
-        bgTile14.position.y = bgTile13.position.y
-        bgTile15.position.x = bgTile11.position.x
-        bgTile15.position.y = bgTile13.position.y
-        bgTile16.position.x = bgTile12.position.x
-        bgTile16.position.y = bgTile13.position.y
-        
-        
+            
+            bgTile2.position.x = bgTile1.position.x + bgTile1.size.width
+            bgTile2.position.y = bgTile1.position.y
+            bgTile3.position.x = bgTile2.position.x + bgTile2.size.width
+            bgTile3.position.y = bgTile1.position.y
+            bgTile4.position.x = bgTile3.position.x + bgTile3.size.width
+            bgTile4.position.y = bgTile1.position.y
+            bgTile5.position.x = bgTile1.position.x
+            bgTile5.position.y = bgTile1.position.y - bgTile1.size.height
+            bgTile6.position.x = bgTile2.position.x
+            bgTile6.position.y = bgTile5.position.y
+            bgTile7.position.x = bgTile3.position.x
+            bgTile7.position.y = bgTile5.position.y
+            bgTile8.position.x = bgTile4.position.x
+            bgTile8.position.y = bgTile5.position.y
+            bgTile9.position.x = bgTile5.position.x
+            bgTile9.position.y = bgTile5.position.y - bgTile5.size.height
+            bgTile10.position.x = bgTile6.position.x
+            bgTile10.position.y = bgTile9.position.y
+            bgTile11.position.x = bgTile7.position.x
+            bgTile11.position.y = bgTile9.position.y
+            bgTile12.position.x = bgTile8.position.x
+            bgTile12.position.y = bgTile9.position.y
+            bgTile13.position.x = bgTile9.position.x
+            bgTile13.position.y = bgTile9.position.y - bgTile9.size.height
+            bgTile14.position.x = bgTile10.position.x
+            bgTile14.position.y = bgTile13.position.y
+            bgTile15.position.x = bgTile11.position.x
+            bgTile15.position.y = bgTile13.position.y
+            bgTile16.position.x = bgTile12.position.x
+            bgTile16.position.y = bgTile13.position.y
+            
+            
         }
         
         
@@ -1750,13 +1069,13 @@ class level2 :SKScene {
         
         
     }
-
-        
     
-        
+    
+    
+    
 }
 
 
-    
+
 
 

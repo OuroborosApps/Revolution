@@ -409,7 +409,7 @@ class levelSelectTrial :SKScene {
                 let reveal = SKTransition.crossFadeWithDuration(0.5)
                 let level2Size = CGSizeMake(1334, 750)
                
-                let level2Scene = level2(size: level2Size)
+                let level2Scene = level2Trial(size: level2Size)
                 self.view?.presentScene(level2Scene, transition: reveal)
                 
             case "level3":
