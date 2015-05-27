@@ -8,7 +8,8 @@
 
 import Foundation
 import SpriteKit
-
+//**************************************************************************************************************************************
+//**************************************************************************************************************************************
 //Below is the function called in the pinchGestureRecognizer to find the centerpoint and centerNode
 
 
@@ -18,13 +19,17 @@ func findCenterNode (centerNodeArray: NSArray) -> (SKNode)?{
         centerNodeCounter++
     }
     if centerNodeCounter > (centerNodeArray.count - 1) {
-        return nil
+        var nilNode: SKNode = SKNode()
+        nilNode.name = "bgTile6"
+        return nilNode
     }
     else {
-        return (centerNodeArray[centerNodeCounter] as? SKNode)!
+        return (centerNodeArray[centerNodeCounter] as! SKNode)
     }
+    
 }
-
+//**************************************************************************************************************************************
+//**************************************************************************************************************************************
 // Below is the function called to correct for overshooting and adjust large scaling values and minimum and maximum tiles sizes
 
 func limitZooming (referenceTile: SKSpriteNode, gesture: UIPinchGestureRecognizer, maxTileWidth: CGFloat, minTileWidth:CGFloat, minScale:CGFloat, maxScale:CGFloat) -> (){
@@ -51,9 +56,10 @@ func limitZooming (referenceTile: SKSpriteNode, gesture: UIPinchGestureRecognize
         gesture.scale = maxTileWidth / referenceTile.size.width
     }
 }
+//**************************************************************************************************************************************
+//**************************************************************************************************************************************
 
-
-//Below is the function called in the pinchGestureRecognizer that scales the background nodes for the zoom
+// Below is the function called in the pinchGestureRecognizer that scales the background nodes for the zoom
 
 func scaleBackgroundNodes (BGNodeArray: Array<SKSpriteNode>, gesture:UIPinchGestureRecognizer) -> () {
     for index in 0...(BGNodeArray.count-1) {
@@ -74,93 +80,343 @@ func failsafeZoom (BGNodeArray: Array<SKSpriteNode>, minTileWidth: CGFloat, minT
         }
     }
 }
+//**************************************************************************************************************************************
+//**************************************************************************************************************************************
+// Below is the function called in pinchGestureRecognizer that centers the zoom on the selected tile
 
-func zoomCenteredOnTile(nodeSelected: Int, BGNodeArray: Array<SKSpriteNode>, numberOfTilesInRow: Int, numberOfTilesInColumn: Int, touchedPoint: CGPoint, scaledXDisp: CGFloat, scaledYDisp: CGFloat) -> () {
-    var nodeIndex = nodeSelected
-    var nodeArrayIndex: Int = nodeIndex - 1
-    BGNodeArray[nodeArrayIndex].position.x = touchedPoint.x - scaledXDisp
-    BGNodeArray[nodeArrayIndex].position.y = touchedPoint.y - scaledYDisp
+func zoomCenteredOnTile(nodeSelected: Double, BGNodeArray: Array<SKSpriteNode>, numberOfTilesInRow: Double, numberOfTilesInColumn: Double, touchedPoint: CGPoint, scaledXDisp: CGFloat, scaledYDisp: CGFloat) -> () {
     
-    var rowRem:Int = nodeIndex % numberOfTilesInRow
-    var colRem:Int = nodeIndex % numberOfTilesInColumn
-    var counter:Int = 0
-    var iterationCounter:Int = 0
     
-    while rowRem != 1 {
-        ++counter
-        --nodeIndex
-        --nodeArrayIndex
-        BGNodeArray[nodeArrayIndex].position.x = BGNodeArray[nodeArrayIndex+1].position.x - BGNodeArray[nodeArrayIndex+1].size.width
-        rowRem = nodeIndex % numberOfTilesInRow
-    }
-    nodeIndex += counter
-    nodeArrayIndex += counter
-    while rowRem != 0 {
+    var nodeIndex: Double = nodeSelected
+    var nodeArrayIndex: Double = nodeIndex-1
+    
+    
+    //set selected tile values
+    BGNodeArray[Int(nodeArrayIndex)].position.x = touchedPoint.x - scaledXDisp
+    BGNodeArray[Int(nodeArrayIndex)].position.y = touchedPoint.y - scaledYDisp
+    
+    
+    
+    //center on selected tile
+    var columnIndex = nodeIndex % numberOfTilesInRow
+    
+    
+    //iterate across tiles to the right of selected tile setting x position
+    while columnIndex != 0 {
         ++nodeIndex
         ++nodeArrayIndex
-        BGNodeArray[nodeArrayIndex].position.x = BGNodeArray[nodeArrayIndex-1].position.x + BGNodeArray[nodeArrayIndex-1].size.width
-        rowRem = nodeIndex % numberOfTilesInRow
+        BGNodeArray[Int(nodeArrayIndex)].position.x =  BGNodeArray[Int(nodeArrayIndex-1)].position.x + BGNodeArray[Int(nodeArrayIndex-1)].size.width
+        columnIndex = nodeIndex % numberOfTilesInRow
     }
-    counter = 0
-    while nodeArrayIndex < BGNodeArray.count {
-        ++counter
-        ++nodeArrayIndex
-        BGNodeArray[nodeArrayIndex].position.x = BGNodeArray[nodeArrayIndex-numberOfTilesInRow].position.x
-    }
-    nodeArrayIndex -= (counter+numberOfTilesInRow-1)
-    while nodeArrayIndex >= 0 {
-        --nodeArrayIndex
-        BGNodeArray[nodeArrayIndex].position.x = BGNodeArray[nodeArrayIndex+numberOfTilesInRow].position.x
-    }
+    
+    //reset to selected tile
     nodeIndex = nodeSelected
-    nodeArrayIndex = nodeIndex - 1
-    colRem = nodeIndex % numberOfTilesInColumn
-    counter = 0
-    while colRem != 1 {
-        ++counter
+    nodeArrayIndex = nodeIndex-1
+    columnIndex = nodeIndex % numberOfTilesInRow
+    
+    //iterate across tiles to the left of selected tile setting x position
+    while columnIndex != 1 {
+        --nodeIndex
+        --nodeArrayIndex
+        BGNodeArray[Int(nodeArrayIndex)].position.x = BGNodeArray[Int(nodeArrayIndex+1)].position.x - BGNodeArray[Int(nodeArrayIndex+1)].size.width
+        columnIndex = nodeIndex % numberOfTilesInRow
+    }
+    var leftMostIndex = nodeIndex
+    
+    //reset to FIRST SET TILE FROM THE LEFT
+    
+    var rowIndex = ceil(nodeIndex/numberOfTilesInColumn)
+    while rowIndex != 1 {
         nodeIndex -= numberOfTilesInRow
         nodeArrayIndex -= numberOfTilesInRow
-        BGNodeArray[nodeArrayIndex].position.y = BGNodeArray[nodeArrayIndex+numberOfTilesInRow].position.y + BGNodeArray[nodeArrayIndex+numberOfTilesInRow].size.height
-        colRem = nodeIndex % numberOfTilesInColumn
-    }
-    nodeIndex += (counter*numberOfTilesInRow)
-    nodeArrayIndex += (counter*numberOfTilesInRow)
-    while colRem != 0 {
-        nodeIndex += numberOfTilesInRow
-        nodeArrayIndex += numberOfTilesInRow
-        BGNodeArray[nodeArrayIndex].position.y = BGNodeArray[nodeArrayIndex-numberOfTilesInRow].position.y - BGNodeArray[nodeArrayIndex-numberOfTilesInRow].size.height
-        colRem = nodeIndex % numberOfTilesInColumn
-    }
-    counter = 0
-    nodeArrayIndex -= (numberOfTilesInRow*numberOfTilesInColumn)
-    nodeIndex = nodeArrayIndex+1
-    
-    while iterationCounter < numberOfTilesInColumn {
-        ++iterationCounter
-        while rowRem != 1 {
-            ++counter
-            --nodeIndex
-            --nodeArrayIndex
-            BGNodeArray[nodeArrayIndex].position.y = BGNodeArray[nodeArrayIndex+1].position.y
-            rowRem = nodeIndex % numberOfTilesInRow
-        }
-        nodeIndex += counter
-        nodeArrayIndex += counter
-        while rowRem != 0 {
-            ++counter
+        var startIndex = nodeIndex
+        BGNodeArray[Int(nodeArrayIndex)].position.x = BGNodeArray[Int(nodeArrayIndex+numberOfTilesInRow)].position.x
+        columnIndex = nodeIndex % numberOfTilesInRow
+        while columnIndex != 0 {
             ++nodeIndex
             ++nodeArrayIndex
-            BGNodeArray[nodeArrayIndex].position.y = BGNodeArray[nodeArrayIndex-1].position.y
-            rowRem = nodeIndex % numberOfTilesInRow
+            BGNodeArray[Int(nodeArrayIndex)].position.x =  BGNodeArray[Int(nodeArrayIndex+numberOfTilesInRow)].position.x
+            columnIndex = nodeIndex % numberOfTilesInRow
         }
-        nodeIndex -= counter
-        nodeArrayIndex -= counter
+        nodeIndex = startIndex
+        nodeArrayIndex = nodeIndex-1
+        rowIndex = ceil(nodeIndex/numberOfTilesInColumn)
+    }
+    nodeIndex = leftMostIndex
+    nodeArrayIndex = nodeIndex-1
+    columnIndex = nodeIndex % numberOfTilesInRow
+    rowIndex = ceil(nodeIndex/numberOfTilesInColumn)
+    
+    while rowIndex != numberOfTilesInColumn {
         nodeIndex += numberOfTilesInRow
         nodeArrayIndex += numberOfTilesInRow
-    }  
+        var startIndex = nodeIndex
+        BGNodeArray[Int(nodeArrayIndex)].position.x = BGNodeArray[Int(nodeArrayIndex-numberOfTilesInRow)].position.x
+        columnIndex = nodeIndex % numberOfTilesInRow
+        while columnIndex != 0 {
+            ++nodeIndex
+            ++nodeArrayIndex
+            BGNodeArray[Int(nodeArrayIndex)].position.x =  BGNodeArray[Int(nodeArrayIndex-numberOfTilesInRow)].position.x
+            columnIndex = nodeIndex % numberOfTilesInRow
+        }
+        
+        nodeIndex = startIndex
+        nodeArrayIndex = nodeIndex-1
+        rowIndex = ceil(nodeIndex/numberOfTilesInColumn)
+    }
+    
+    
+    //reset to selected tile
+    nodeIndex = nodeSelected
+    nodeArrayIndex = nodeIndex-1
+    rowIndex = ceil(nodeIndex/numberOfTilesInColumn)
+    
+    //iterate to tiles above selected tile setting y position
+    
+    while rowIndex != numberOfTilesInColumn {
+        nodeIndex += numberOfTilesInRow
+        nodeArrayIndex += numberOfTilesInRow
+        BGNodeArray[Int(nodeArrayIndex)].position.y = BGNodeArray[Int(nodeArrayIndex-numberOfTilesInRow)].position.y - BGNodeArray[Int(nodeArrayIndex-numberOfTilesInRow)].size.height
+        rowIndex = ceil(nodeIndex/numberOfTilesInColumn)
+    }
+    
+    nodeIndex = nodeSelected
+    nodeArrayIndex = nodeIndex-1
+    rowIndex = ceil(nodeIndex/numberOfTilesInColumn)
+    
+    while rowIndex != 1 {
+        nodeIndex -= numberOfTilesInRow
+        nodeArrayIndex -= numberOfTilesInRow
+        BGNodeArray[Int(nodeArrayIndex)].position.y = BGNodeArray[Int(nodeArrayIndex+numberOfTilesInRow)].position.y + BGNodeArray[Int(nodeArrayIndex+numberOfTilesInRow)].size.height
+        rowIndex = ceil(nodeIndex/numberOfTilesInColumn)
+    }
+    
+    var topMostIndex = nodeIndex
+    
+    columnIndex = nodeIndex % numberOfTilesInRow
+    
+    while columnIndex != 0 {
+        ++nodeIndex
+        ++nodeArrayIndex
+        var startIndex = nodeIndex
+        BGNodeArray[Int(nodeArrayIndex)].position.y = BGNodeArray[Int(nodeArrayIndex-1)].position.y
+        rowIndex = ceil(nodeIndex/numberOfTilesInColumn)
+        while rowIndex != numberOfTilesInColumn {
+            nodeIndex += numberOfTilesInRow
+            nodeArrayIndex += numberOfTilesInRow
+            BGNodeArray[Int(nodeArrayIndex)].position.y = BGNodeArray[Int(nodeArrayIndex-1)].position.y
+            rowIndex = ceil(nodeIndex/numberOfTilesInColumn)
+        }
+        nodeIndex = startIndex
+        nodeArrayIndex = nodeIndex-1
+        columnIndex = nodeIndex % numberOfTilesInRow
+    }
+    
+    nodeIndex = topMostIndex
+    nodeArrayIndex = nodeIndex - 1
+    rowIndex = ceil(nodeIndex/numberOfTilesInColumn)
+    columnIndex = nodeIndex % numberOfTilesInRow
+    
+    while columnIndex != 1 {
+        --nodeIndex
+        --nodeArrayIndex
+        var startIndex = nodeIndex
+        BGNodeArray[Int(nodeArrayIndex)].position.y = BGNodeArray[Int(nodeArrayIndex+1)].position.y
+        rowIndex = ceil(nodeIndex/numberOfTilesInColumn)
+        while rowIndex != numberOfTilesInColumn {
+            nodeIndex += numberOfTilesInRow
+            nodeArrayIndex += numberOfTilesInRow
+            BGNodeArray[Int(nodeArrayIndex)].position.y = BGNodeArray[Int(nodeArrayIndex+1)].position.y
+            rowIndex = ceil(nodeIndex/numberOfTilesInColumn)
+        }
+        nodeIndex = startIndex
+        nodeArrayIndex = nodeIndex-1
+        columnIndex = nodeIndex % numberOfTilesInRow
+    }
+    
+    
+    
+
+}
+//**************************************************************************************************************************************
+//**************************************************************************************************************************************
+// Below is the function called in pinchGestureRecognizer to corrected for over-zooming
+
+func zoomCorrectNodes (BGNodeArray: Array<SKSpriteNode>, sceneWidth: CGFloat, sceneHeight: CGFloat, numberOfTilesInRow: Int, numberOfTilesInColumn: Int) -> () {
+    if (BGNodeArray[0].position.x - BGNodeArray[0].size.width/2) > 0 {
+        
+        BGNodeArray[0].position.x = BGNodeArray[0].size.width/2
+        for index in 1...(numberOfTilesInRow-1) {
+            BGNodeArray[index].position.x = BGNodeArray[index-1].position.x + BGNodeArray[index-1].size.width
+        }
+        for index in numberOfTilesInRow...(BGNodeArray.count-1) {
+            BGNodeArray[index].position.x = BGNodeArray[index-numberOfTilesInRow].position.x
+        }
+    }
+    if (BGNodeArray[0].position.y + BGNodeArray[0].size.height/2) < sceneHeight {
+        
+        BGNodeArray[0].position.y = sceneHeight - BGNodeArray[0].size.height/2
+        for index in stride (from: numberOfTilesInRow, through:(numberOfTilesInColumn*(numberOfTilesInRow-1)), by: numberOfTilesInColumn) {
+            BGNodeArray[index].position.y = BGNodeArray[index-numberOfTilesInColumn].position.y - BGNodeArray[index-numberOfTilesInColumn].size.height
+        }
+        for iterationIndex in 0...(numberOfTilesInColumn-1) {
+            for index in 1...(numberOfTilesInRow-1) {
+                BGNodeArray[index+iterationIndex*numberOfTilesInRow].position.y = BGNodeArray[iterationIndex*numberOfTilesInRow].position.y
+            }
+        }
+    }
+    if (BGNodeArray[BGNodeArray.count-1].position.x + BGNodeArray[BGNodeArray.count-1].size.width/2) < sceneWidth {
+        
+        BGNodeArray[BGNodeArray.count-1].position.x = sceneWidth - BGNodeArray[BGNodeArray.count-1].size.width/2
+        for index in stride (from:(BGNodeArray.count-2), through: (BGNodeArray.count-numberOfTilesInRow), by: -1) {
+            BGNodeArray[index].position.x = BGNodeArray[index+1].position.x - BGNodeArray[index+1].size.width
+        }
+        for index in stride (from:(BGNodeArray.count-numberOfTilesInRow-1), through: 0, by: -1) {
+            BGNodeArray[index].position.x = BGNodeArray[index+numberOfTilesInRow].position.x
+        }
+    }
+    if (BGNodeArray[BGNodeArray.count-1].position.y - (BGNodeArray[BGNodeArray.count-1].size.height)/2) > 0 {
+        
+        BGNodeArray[BGNodeArray.count-1].position.y = BGNodeArray[BGNodeArray.count-1].size.height/2
+        for index in stride(from: (BGNodeArray.count-1-numberOfTilesInRow), through: (numberOfTilesInRow-1), by: (-1*numberOfTilesInRow)) {
+          BGNodeArray[index].position.y = BGNodeArray[index+numberOfTilesInRow].position.y + BGNodeArray[index+numberOfTilesInRow].size.height
+            
+        }
+        for iterationIndex in 0...(numberOfTilesInColumn-1) {
+            for index in stride(from: (BGNodeArray.count-2), through: (BGNodeArray.count-numberOfTilesInRow), by: -1) {
+                BGNodeArray[index-iterationIndex*numberOfTilesInRow].position.y = BGNodeArray[(BGNodeArray.count-1)-(iterationIndex*numberOfTilesInRow)].position.y
+            }
+        }
+        
+    }
+}
+//**************************************************************************************************************************************
+//**************************************************************************************************************************************
+// Below is the function called in the panGestureRecognizer to set the background physics bodies to dynamic
+
+func setBGPhysicsBodiesToDynamic (BGNodeArray: Array<SKSpriteNode>) -> () {
+    for index in 0...(BGNodeArray.count-1) {
+        BGNodeArray[index].physicsBody?.dynamic = true
+    }
 }
 
+func setBGPhysicsBodiesFromDynamic (BGNodeArray: Array<SKSpriteNode>) -> () {
+    for index in 0...(BGNodeArray.count-1) {
+        BGNodeArray[index].physicsBody?.dynamic = true
+    }
+}
+//**************************************************************************************************************************************
+//**************************************************************************************************************************************
+// Below is the function called in the panGestureRecognizer to set the final velocity to the panned nodes
 
+func applyFinalVelocities (BGNodeArray: Array<SKSpriteNode>, finalVelocityStorage: CGPoint) -> () {
+    for index in 0...(BGNodeArray.count-1) {
+        BGNodeArray[index].physicsBody?.velocity = CGVectorMake(finalVelocityStorage.x, -finalVelocityStorage.y)
+    }
+}
+//**************************************************************************************************************************************
+//**************************************************************************************************************************************
+// Below is the function called to set up the background tiles
 
+func setUpBackgroundTiles (BGNodeArray: Array<SKSpriteNode>,  sceneWidth: CGFloat, sceneHeight: CGFloat) -> () {
+    var initialPositionArray: Array<CGPoint> = [CGPointMake(-1*sceneWidth, 2*sceneHeight),CGPointMake(0, 2*sceneHeight),CGPointMake(sceneWidth, 2*sceneHeight),CGPointMake(2*sceneWidth, 2*sceneHeight),CGPointMake(-sceneWidth, sceneHeight),CGPointMake(0, sceneHeight), CGPointMake(sceneWidth, sceneHeight), CGPointMake(2*sceneWidth, sceneHeight), CGPointMake(-sceneWidth, 0), CGPointMake(0, 0), CGPointMake(sceneWidth, 0), CGPointMake(2*sceneWidth, 0), CGPointMake(-sceneWidth, -sceneHeight), CGPointMake(0, -sceneHeight), CGPointMake(sceneWidth, -sceneHeight), CGPointMake(2*sceneWidth, -sceneHeight)]
+    var nameArray: Array<String> = ["bgTile1", "bgTile2", "bgTile3", "bgTile4", "bgTile5", "bgTile6", "bgTile7", "bgTile8", "bgTile9", "bgTile10", "bgTile11", "bgTile12", "bgTile13", "bgTile14", "bgTile15", "bgTile16",]
+    struct PhysicsCategory {
+        static let None : UInt32 = 0
+        static let All : UInt32 = UInt32.max
+        static let background : UInt32 = 0b1
+        static let star : UInt32 = 0b10
+        static let planet : UInt32 = 0b11
+    }
+    for index in 0...(BGNodeArray.count-1){
+        BGNodeArray[index].physicsBody = SKPhysicsBody(rectangleOfSize: CGSizeMake(1, 1))
+        BGNodeArray[index].physicsBody?.categoryBitMask = PhysicsCategory.background
+        BGNodeArray[index].physicsBody?.contactTestBitMask = PhysicsCategory.None
+        BGNodeArray[index].physicsBody?.collisionBitMask = PhysicsCategory.None
+        setBGPhysicsBodiesFromDynamic(BGNodeArray)
+        BGNodeArray[index].position = initialPositionArray[index]
+        BGNodeArray[index].zPosition = 0
+        BGNodeArray[index].name = nameArray[index]
+        
+    }
+    
+}
+//**************************************************************************************************************************************
+//**************************************************************************************************************************************
+// Below is the function called to make the tiles follow the first tile
 
+func followTile (BGNodeArray: Array<SKSpriteNode>) -> () {
+    
+    BGNodeArray[1].position.x = BGNodeArray[0].position.x + BGNodeArray[0].size.width
+    BGNodeArray[1].position.y = BGNodeArray[0].position.y
+    BGNodeArray[2].position.x = BGNodeArray[1].position.x + BGNodeArray[1].size.width
+    BGNodeArray[2].position.y = BGNodeArray[0].position.y
+    BGNodeArray[3].position.x = BGNodeArray[2].position.x + BGNodeArray[2].size.width
+    BGNodeArray[3].position.y = BGNodeArray[0].position.y
+    BGNodeArray[4].position.x = BGNodeArray[0].position.x
+    BGNodeArray[4].position.y = BGNodeArray[0].position.y - BGNodeArray[0].size.height
+    BGNodeArray[5].position.x = BGNodeArray[1].position.x
+    BGNodeArray[5].position.y = BGNodeArray[4].position.y
+    BGNodeArray[6].position.x = BGNodeArray[2].position.x
+    BGNodeArray[6].position.y = BGNodeArray[4].position.y
+    BGNodeArray[7].position.x = BGNodeArray[3].position.x
+    BGNodeArray[7].position.y = BGNodeArray[4].position.y
+    BGNodeArray[8].position.x = BGNodeArray[4].position.x
+    BGNodeArray[8].position.y = BGNodeArray[4].position.y - BGNodeArray[4].size.height
+    BGNodeArray[9].position.x = BGNodeArray[5].position.x
+    BGNodeArray[9].position.y = BGNodeArray[8].position.y
+    BGNodeArray[10].position.x = BGNodeArray[6].position.x
+    BGNodeArray[10].position.y = BGNodeArray[8].position.y
+    BGNodeArray[11].position.x = BGNodeArray[7].position.x
+    BGNodeArray[11].position.y = BGNodeArray[8].position.y
+    BGNodeArray[12].position.x = BGNodeArray[8].position.x
+    BGNodeArray[12].position.y = BGNodeArray[8].position.y - BGNodeArray[8].size.height
+    BGNodeArray[13].position.x = BGNodeArray[9].position.x
+    BGNodeArray[13].position.y = BGNodeArray[12].position.y
+    BGNodeArray[14].position.x = BGNodeArray[10].position.x
+    BGNodeArray[14].position.y = BGNodeArray[12].position.y
+    BGNodeArray[15].position.x = BGNodeArray[11].position.x
+    BGNodeArray[15].position.y = BGNodeArray[12].position.y
+}
+//**************************************************************************************************************************************
+//**************************************************************************************************************************************
+// Below is the function called to set the background velocities to 0
+
+func decreaseTileXVelocity (BGNodeArray: Array<SKSpriteNode>, decellerationConst: CGFloat) -> () {
+    for index in 0...(BGNodeArray.count-1) {
+        BGNodeArray[index].physicsBody?.velocity.dx -= decellerationConst
+    }
+}
+
+func setTileXVelocityToZero (BGNodeArray: Array<SKSpriteNode>) -> () {
+    for index in 0...(BGNodeArray.count-1) {
+        BGNodeArray[index].physicsBody?.velocity.dx = 0
+    }
+}
+func increaseTileXVelocity (BGNodeArray: Array<SKSpriteNode>, decellerationConst: CGFloat) -> () {
+    for index in 0...(BGNodeArray.count-1) {
+        BGNodeArray[index].physicsBody?.velocity.dx += decellerationConst
+    }
+}
+
+func decreaseTileYVelocity (BGNodeArray: Array<SKSpriteNode>, decellerationConst: CGFloat) -> () {
+    for index in 0...(BGNodeArray.count-1) {
+        BGNodeArray[index].physicsBody?.velocity.dy -= decellerationConst
+    }
+}
+func setTileYVelocityToZero (BGNodeArray: Array<SKSpriteNode>) -> () {
+    for index in 0...(BGNodeArray.count-1) {
+        BGNodeArray[index].physicsBody?.velocity.dy = 0
+    }
+}
+func increaseTileYVelocity (BGNodeArray: Array<SKSpriteNode>, decellerationConst: CGFloat) -> () {
+    for index in 0...(BGNodeArray.count-1) {
+        BGNodeArray[index].physicsBody?.velocity.dy += decellerationConst
+    }
+}
+func setTileTotalVelocityToZero (BGNodeArray: Array<SKSpriteNode>) -> () {
+    for index in 0...(BGNodeArray.count-1) {
+        BGNodeArray[index].physicsBody?.velocity = CGVectorMake(0, 0)
+    }
+}
 

@@ -15,7 +15,7 @@
 		270486BB1A206C7200823432 /* titleStar.png in Resources */ = {isa = PBXBuildFile; fileRef = 270486B91A206C7200823432 /* titleStar.png */; };
 		270486BD1A20776000823432 /* PlanetLevelViewer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 270486BC1A20776000823432 /* PlanetLevelViewer.swift */; };
 		270A20611A32527D00E96B1B /* LevelSelectTrial.swift in Sources */ = {isa = PBXBuildFile; fileRef = 270A20601A32527D00E96B1B /* LevelSelectTrial.swift */; };
-		2713DC9E1B13FBE30087AE09 /* Level2Trial.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2713DC9D1B13FBE30087AE09 /* Level2Trial.swift */; };
+		2713DC9E1B13FBE30087AE09 /* Level2.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2713DC9D1B13FBE30087AE09 /* Level2.swift */; };
 		2713DCA01B13FBF60087AE09 /* TiledBackgroundFunc.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2713DC9F1B13FBF60087AE09 /* TiledBackgroundFunc.swift */; };
 		273E108E1A2436B000DA0E03 /* planetLevelViewer3.png in Resources */ = {isa = PBXBuildFile; fileRef = 273E10841A2436B000DA0E03 /* planetLevelViewer3.png */; };
 		273E108F1A2436B000DA0E03 /* planetLevelViewer10.png in Resources */ = {isa = PBXBuildFile; fileRef = 273E10851A2436B000DA0E03 /* planetLevelViewer10.png */; };
@@ -27,7 +27,6 @@
 		273E10951A2436B000DA0E03 /* planetLevelViewer2.png in Resources */ = {isa = PBXBuildFile; fileRef = 273E108B1A2436B000DA0E03 /* planetLevelViewer2.png */; };
 		273E10961A2436B000DA0E03 /* planetLevelViewer9.png in Resources */ = {isa = PBXBuildFile; fileRef = 273E108C1A2436B000DA0E03 /* planetLevelViewer9.png */; };
 		273E10971A2436B000DA0E03 /* planetLevelViewer7.png in Resources */ = {isa = PBXBuildFile; fileRef = 273E108D1A2436B000DA0E03 /* planetLevelViewer7.png */; };
-		273E10991A25690600DA0E03 /* Level2.swift in Sources */ = {isa = PBXBuildFile; fileRef = 273E10981A25690600DA0E03 /* Level2.swift */; };
 		273E109B1A2569C800DA0E03 /* Level3.swift in Sources */ = {isa = PBXBuildFile; fileRef = 273E109A1A2569C800DA0E03 /* Level3.swift */; };
 		273E109D1A2569CF00DA0E03 /* Level4.swift in Sources */ = {isa = PBXBuildFile; fileRef = 273E109C1A2569CF00DA0E03 /* Level4.swift */; };
 		273E109F1A2569D400DA0E03 /* Level5.swift in Sources */ = {isa = PBXBuildFile; fileRef = 273E109E1A2569D400DA0E03 /* Level5.swift */; };
@@ -41,6 +40,7 @@
 		2744D7161A1D92BE00457231 /* star.png in Resources */ = {isa = PBXBuildFile; fileRef = 2744D7121A1D92BE00457231 /* star.png */; };
 		2744D7181A1D9AC100457231 /* Space_BG_1.png in Resources */ = {isa = PBXBuildFile; fileRef = 2744D7171A1D9AC100457231 /* Space_BG_1.png */; };
 		276A8E1F1A674FD6006DE7CB /* LevelSelectTrial2.swift in Sources */ = {isa = PBXBuildFile; fileRef = 276A8E1E1A674FD6006DE7CB /* LevelSelectTrial2.swift */; };
+		277555331B168FF100164ED8 /* SpriteNodeMotionFunc.swift in Sources */ = {isa = PBXBuildFile; fileRef = 277555321B168FF100164ED8 /* SpriteNodeMotionFunc.swift */; };
 		2777759C1A3E721B00AAE5B1 /* HDHR_Space_BG9.png in Resources */ = {isa = PBXBuildFile; fileRef = 2777758C1A3E721B00AAE5B1 /* HDHR_Space_BG9.png */; };
 		2777759D1A3E721B00AAE5B1 /* HDHR_Space_BG11.png in Resources */ = {isa = PBXBuildFile; fileRef = 2777758D1A3E721B00AAE5B1 /* HDHR_Space_BG11.png */; };
 		2777759E1A3E721B00AAE5B1 /* HDHR_Space_BG8.png in Resources */ = {isa = PBXBuildFile; fileRef = 2777758E1A3E721B00AAE5B1 /* HDHR_Space_BG8.png */; };
@@ -93,7 +93,7 @@
 		270486B91A206C7200823432 /* titleStar.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = titleStar.png; sourceTree = "<group>"; };
 		270486BC1A20776000823432 /* PlanetLevelViewer.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = PlanetLevelViewer.swift; sourceTree = "<group>"; };
 		270A20601A32527D00E96B1B /* LevelSelectTrial.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = LevelSelectTrial.swift; sourceTree = "<group>"; };
-		2713DC9D1B13FBE30087AE09 /* Level2Trial.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Level2Trial.swift; sourceTree = "<group>"; };
+		2713DC9D1B13FBE30087AE09 /* Level2.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Level2.swift; sourceTree = "<group>"; };
 		2713DC9F1B13FBF60087AE09 /* TiledBackgroundFunc.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = TiledBackgroundFunc.swift; sourceTree = "<group>"; };
 		273E10841A2436B000DA0E03 /* planetLevelViewer3.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = planetLevelViewer3.png; sourceTree = "<group>"; };
 		273E10851A2436B000DA0E03 /* planetLevelViewer10.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = planetLevelViewer10.png; sourceTree = "<group>"; };
@@ -105,7 +105,6 @@
 		273E108B1A2436B000DA0E03 /* planetLevelViewer2.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = planetLevelViewer2.png; sourceTree = "<group>"; };
 		273E108C1A2436B000DA0E03 /* planetLevelViewer9.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = planetLevelViewer9.png; sourceTree = "<group>"; };
 		273E108D1A2436B000DA0E03 /* planetLevelViewer7.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = planetLevelViewer7.png; sourceTree = "<group>"; };
-		273E10981A25690600DA0E03 /* Level2.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Level2.swift; sourceTree = "<group>"; };
 		273E109A1A2569C800DA0E03 /* Level3.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Level3.swift; sourceTree = "<group>"; };
 		273E109C1A2569CF00DA0E03 /* Level4.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Level4.swift; sourceTree = "<group>"; };
 		273E109E1A2569D400DA0E03 /* Level5.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Level5.swift; sourceTree = "<group>"; };
@@ -119,6 +118,7 @@
 		2744D7121A1D92BE00457231 /* star.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = star.png; sourceTree = "<group>"; };
 		2744D7171A1D9AC100457231 /* Space_BG_1.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = Space_BG_1.png; sourceTree = "<group>"; };
 		276A8E1E1A674FD6006DE7CB /* LevelSelectTrial2.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = LevelSelectTrial2.swift; sourceTree = "<group>"; };
+		277555321B168FF100164ED8 /* SpriteNodeMotionFunc.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SpriteNodeMotionFunc.swift; sourceTree = "<group>"; };
 		2777758C1A3E721B00AAE5B1 /* HDHR_Space_BG9.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = HDHR_Space_BG9.png; sourceTree = "<group>"; };
 		2777758D1A3E721B00AAE5B1 /* HDHR_Space_BG11.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = HDHR_Space_BG11.png; sourceTree = "<group>"; };
 		2777758E1A3E721B00AAE5B1 /* HDHR_Space_BG8.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = HDHR_Space_BG8.png; sourceTree = "<group>"; };
@@ -249,8 +249,8 @@
 				270A20601A32527D00E96B1B /* LevelSelectTrial.swift */,
 				276A8E1E1A674FD6006DE7CB /* LevelSelectTrial2.swift */,
 				27C99EB11B06C98400FE0710 /* Level1.swift */,
-				273E10981A25690600DA0E03 /* Level2.swift */,
-				2713DC9D1B13FBE30087AE09 /* Level2Trial.swift */,
+				2713DC9D1B13FBE30087AE09 /* Level2.swift */,
+				277555321B168FF100164ED8 /* SpriteNodeMotionFunc.swift */,
 				2713DC9F1B13FBF60087AE09 /* TiledBackgroundFunc.swift */,
 				273E109A1A2569C800DA0E03 /* Level3.swift */,
 				273E109C1A2569CF00DA0E03 /* Level4.swift */,
@@ -446,7 +446,7 @@
 				270486B11A20104900823432 /* LevelSelect.swift in Sources */,
 				276A8E1F1A674FD6006DE7CB /* LevelSelectTrial2.swift in Sources */,
 				273E109F1A2569D400DA0E03 /* Level5.swift in Sources */,
-				2713DC9E1B13FBE30087AE09 /* Level2Trial.swift in Sources */,
+				2713DC9E1B13FBE30087AE09 /* Level2.swift in Sources */,
 				273E109B1A2569C800DA0E03 /* Level3.swift in Sources */,
 				27DF96F21A1998C1008AFFE7 /* AppDelegate.swift in Sources */,
 				270486B71A206C6800823432 /* TitleScreen.swift in Sources */,
@@ -454,10 +454,10 @@
 				273E109D1A2569CF00DA0E03 /* Level4.swift in Sources */,
 				2713DCA01B13FBF60087AE09 /* TiledBackgroundFunc.swift in Sources */,
 				273E10A51A2569E300DA0E03 /* Level8.swift in Sources */,
+				277555331B168FF100164ED8 /* SpriteNodeMotionFunc.swift in Sources */,
 				27DF97161A1999A4008AFFE7 /* Star.swift in Sources */,
 				27DF97181A19A372008AFFE7 /* Planet.swift in Sources */,
 				27C99EB41B06C9D300FE0710 /* Tracer.swift in Sources */,
-				273E10991A25690600DA0E03 /* Level2.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
