@@ -36,6 +36,9 @@ class level2 :SKScene {
     let decellerationConst:CGFloat = 7
     
     var hasBeenStopped = false
+    var updateDisp = true
+    
+    var oldPosition: CGPoint?
     
     let star1 = star(imageNamed: "star")
     let planet1 = planet(imageNamed: "planet")
@@ -93,30 +96,64 @@ class level2 :SKScene {
         // Finds the midpoint location of the pinch gesture
         var gesturePoint = gesture.locationInView(self.view)
         var touchedPoint = convertPointFromView(gesturePoint)
+       
         if gesture.state == UIGestureRecognizerState.Began{
+            updateDisp = false
             var centerNodeArray = nodesAtPoint(touchedPoint)
             centerNode = findCenterNode(centerNodeArray)!
+            
         }
-        // Finding the distance between the touchedPoint and the center of the center Node
+        //*******************************************************************************************
+        // ***Finding the distance between the touchedPoint and the center of the center Node***
         var xDisp = touchedPoint.x - centerNode!.position.x
         var yDisp = touchedPoint.y - centerNode!.position.y
-        //Correct the Zooming
-        limitZooming(bgTile1, gesture, maxTileWidth, minTileWidth, minScale, maxScale)
-        //Scaling Functions for the background nodes (all the planet nodes need to be added)
-        scaleBackgroundNodes(BGNodeArray, gesture)
-        //Additional nodes present in the scene also need to be scaled below
-        star1.size = CGSizeMake(star1.size.width * gesture.scale, star1.size.height * gesture.scale)
         var scaledXDisp: CGFloat = xDisp * gesture.scale
         var scaledYDisp: CGFloat = yDisp * gesture.scale
-        //Failsafe : Corrects if the scale function overshoots the scaling for either zoom in or zoom out
+        //*******************************************************************************************
+        //********************************Correct the Zooming****************************************
+        //*******************************************************************************************
+        limitZooming(bgTile1, gesture, maxTileWidth, minTileWidth, minScale, maxScale)
+        
+        //*******************************************************************************************
+        //*****************Scaling Functions for the background nodes********************************
+        //*******************************************************************************************
+        scaleBackgroundNodes(BGNodeArray, gesture)
+        
+        //*******************************************************************************************
+        //**********************************Scaling for Planets and Stars Below**********************
+        //*******************************************************************************************
+        star1.size = CGSizeMake(star1.size.width * gesture.scale, star1.size.height * gesture.scale)
+        
+        //**********************************************************************************************************************
+        //***********Failsafe : Corrects if the scale function overshoots the scaling for either zoom in or zoom out************
+        //**********************************************************************************************************************
         failsafeZoom(BGNodeArray, minTileWidth, minTileHeight, maxTileWidth, maxTileHeight)
-        // Weird but only method I could think of for calling the function to center the zoom on a specific node !!! This will fail if the nodes are renamed!!!
+        //*******************************************************************************************
+        // *Weird but only method I could think of for calling the function to center the zoom on a specific node !!! This will fail if the nodes are renamed!!!*
+        //*******************************************************************************************
+        //*******************************************************************************************
         var centerNodeName = String(centerNode!.name!)
         var miscArray = centerNodeName.componentsSeparatedByString("e")
         var selectedNode = Double(miscArray[1].toInt()!)
+        //*******************************************************************************************
+        //**************************Zooming Movement for Background Nodes****************************
+        //*******************************************************************************************
         zoomCenteredOnTile(selectedNode, BGNodeArray, Double(numberOfTilesInRow), Double(numberOfTilesInColumn), touchedPoint, scaledXDisp, scaledYDisp)
+        //*******************************************************************************************
+        //**************************Zooming Movement for Stars and Planets Below*********************
+        //*******************************************************************************************
+        moveSpriteNodeWithPinch(star1, touchedPoint, gesture)
+        
+        //*******************************************************************************************
+        //**************************Zooming Correction for Background Nodes**************************
+        //*******************************************************************************************
         zoomCorrectNodes(BGNodeArray, sceneWidth, sceneHeight, numberOfTilesInRow, numberOfTilesInColumn)
         gesture.scale = 1
+        
+        if gesture.state == UIGestureRecognizerState.Ended {
+            updateDisp = true
+        }
+        
         
     }
 //***********************************************************************************************************************************************
@@ -131,6 +168,7 @@ class level2 :SKScene {
     func handlePanGesture(panGesture: UIPanGestureRecognizer){
         let BGNodeArray:Array = [bgTile1, bgTile2, bgTile3, bgTile4, bgTile5, bgTile6, bgTile7, bgTile8, bgTile9, bgTile10, bgTile11, bgTile12, bgTile13, bgTile14, bgTile15, bgTile16]
         if panGesture.state == UIGestureRecognizerState.Began {
+            
            setBGPhysicsBodiesToDynamic(BGNodeArray)
             // Add the remaining nodes that need to be moved below
         }
@@ -144,8 +182,10 @@ class level2 :SKScene {
                 
                 deltaPoint.x = self.size.width / 2 - bgTile4.position.x
             }
+            //***********************************************************************************************************************************//
+            //*************************************Panning Movement for Background***************************************************************//
             //********* I know it's ugly but it's the most responsive because the other method creates arrays and therefore is more intensive*****
-            
+            //***********************************************************************************************************************************//
             bgTile1.position = convertPointFromView(CGPointMake(convertPointToView(bgTile1.position).x+deltaPoint.x, convertPointToView(bgTile1.position).y+deltaPoint.y))
             bgTile2.position = convertPointFromView(CGPointMake(convertPointToView(bgTile2.position).x+deltaPoint.x, convertPointToView(bgTile2.position).y+deltaPoint.y))
             bgTile3.position = convertPointFromView(CGPointMake(convertPointToView(bgTile3.position).x+deltaPoint.x, convertPointToView(bgTile3.position).y+deltaPoint.y))
@@ -162,7 +202,13 @@ class level2 :SKScene {
             bgTile14.position = convertPointFromView(CGPointMake(convertPointToView(bgTile14.position).x+deltaPoint.x, convertPointToView(bgTile14.position).y+deltaPoint.y))
             bgTile15.position = convertPointFromView(CGPointMake(convertPointToView(bgTile15.position).x+deltaPoint.x, convertPointToView(bgTile15.position).y+deltaPoint.y))
             bgTile16.position = convertPointFromView(CGPointMake(convertPointToView(bgTile16.position).x+deltaPoint.x, convertPointToView(bgTile16.position).y+deltaPoint.y))
-            //*********************************************************//
+            //***********************************************************************************************************************************//
+            //***************************************Panning Movement For Stars and Planets Below************************************************//
+            //***********************************************************************************************************************************//
+            
+            
+            //***********************************************************************************************************************************//
+            //***********************************************************************************************************************************//
             if bgTile1.position.y - deltaPoint.y < self.size.height / 2 {
                 deltaPoint.y = self.size.height / 2 - bgTile1.position.y
             }
@@ -175,7 +221,10 @@ class level2 :SKScene {
         var finalVelocityStorage:CGPoint = panGesture.velocityInView(self.view)
         
         if panGesture.state == UIGestureRecognizerState.Ended {
+            //********Final Velocities Applied to Background********//
             applyFinalVelocities(BGNodeArray, finalVelocityStorage)
+            //******************************************************//
+           
             hasBeenStopped = false
         }
     }
@@ -208,7 +257,7 @@ class level2 :SKScene {
         addChild(bgTile15)
         addChild(bgTile16)
         //******************************************************************************************
-        
+        oldPosition = bgTile1.position
         
         self.physicsWorld.gravity = CGVectorMake(0, 0)
         
@@ -224,6 +273,7 @@ class level2 :SKScene {
         //Star Creation
         
         star1.position = CGPoint(x: self.size.width / 2, y: self.size.height / 2)
+        star1.physicsBody = SKPhysicsBody(circleOfRadius: star1.size.width/2)
         star1.physicsBody?.friction = 0
         star1.physicsBody?.linearDamping = 0
         star1.physicsBody?.angularDamping = 0
@@ -424,6 +474,16 @@ class level2 :SKScene {
             
             setTileTotalVelocityToZero(BGNodeArray)
         }
+        //*******************************************************************************************************
+        //*******************************Stars and Planets Update Functions**************************************
+        //*******************************************************************************************************
+        if updateDisp {
+            moveSpriteNodeAfterPan(star1, bgTile1, oldPosition!)
+        }
+        //***
+        oldPosition = bgTile1.position
+        //***
+        //*******************************************************************************************************
         
     }
 //***********************************************************************************************************************************************
