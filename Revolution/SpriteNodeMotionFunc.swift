@@ -10,7 +10,9 @@ import Foundation
 import SpriteKit
 
 
-//Needs work -> works fine except when there is border correction during the pinch
+// The functions below work well but not perfectly. There can be some unwanted motion in the star node with rapid zooming. For now this method is OK but try to get a method working that relies on absolute positioning. Create a variable that record the star node's position from x and y as a reference and then scale that reference with the gesture scale upon zooming.
+
+
 func moveSpriteNodeWithPinch(node: SKSpriteNode, touchedPoint: CGPoint, gesture: UIPinchGestureRecognizer) -> () {
     var xDisp: CGFloat = touchedPoint.x - node.position.x
     var yDisp: CGFloat = touchedPoint.y - node.position.y
@@ -19,6 +21,12 @@ func moveSpriteNodeWithPinch(node: SKSpriteNode, touchedPoint: CGPoint, gesture:
     node.position.x = touchedPoint.x - xDispScaled
     node.position.y = touchedPoint.y - yDispScaled
 }
+
+func moveSpriteNodeWithEdgeCorrection(node: SKSpriteNode, returnPoint: CGPoint) -> () {
+    node.position.x -= returnPoint.x
+    node.position.y -= returnPoint.y
+}
+
 /*
 func moveSpriteNodeWithPan(node: SKSpriteNode, level: SKScene, deltaPoint: CGPoint) -> () {
     node.position = level.convertPointFromView(CGPointMake(level.convertPointToView(node.position).x+deltaPoint.x, level.convertPointToView(node.position).y+deltaPoint.y))

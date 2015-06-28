@@ -147,7 +147,15 @@ class level2 :SKScene {
         //*******************************************************************************************
         //**************************Zooming Correction for Background Nodes**************************
         //*******************************************************************************************
-        zoomCorrectNodes(BGNodeArray, sceneWidth, sceneHeight, numberOfTilesInRow, numberOfTilesInColumn)
+        var returnPoint = zoomCorrectNodes(BGNodeArray, sceneWidth, sceneHeight, numberOfTilesInRow, numberOfTilesInColumn)
+        
+        if BGNodeArray[0].size.width > minTileWidth {
+            moveSpriteNodeWithEdgeCorrection(star1,returnPoint)
+        }
+        println(returnPoint)
+        println(star1.position)
+        
+        
         gesture.scale = 1
         
         if gesture.state == UIGestureRecognizerState.Ended {
