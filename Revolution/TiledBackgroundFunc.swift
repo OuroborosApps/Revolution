@@ -242,11 +242,11 @@ func zoomCenteredOnTile(nodeSelected: Double, BGNodeArray: Array<SKSpriteNode>, 
 //**************************************************************************************************************************************
 // Below is the function called in pinchGestureRecognizer to corrected for over-zooming
 
-func zoomCorrectNodes (BGNodeArray: Array<SKSpriteNode>, sceneWidth: CGFloat, sceneHeight: CGFloat, numberOfTilesInRow: Int, numberOfTilesInColumn: Int) -> CGPoint {
+func zoomCorrectNodes (BGNodeArray: Array<SKSpriteNode>, sceneWidth: CGFloat, sceneHeight: CGFloat, numberOfTilesInRow: Int, numberOfTilesInColumn: Int) -> () {
     
-    var returnPoint: CGPoint = CGPointMake(0, 0)
+    
     if (BGNodeArray[0].position.x - BGNodeArray[0].size.width/2) > 0 {
-        returnPoint.x = BGNodeArray[0].position.x - BGNodeArray[0].size.width/2
+        
         BGNodeArray[0].position.x = BGNodeArray[0].size.width/2
         for index in 1...(numberOfTilesInRow-1) {
             BGNodeArray[index].position.x = BGNodeArray[index-1].position.x + BGNodeArray[index-1].size.width
@@ -257,7 +257,7 @@ func zoomCorrectNodes (BGNodeArray: Array<SKSpriteNode>, sceneWidth: CGFloat, sc
         
     }
     if (BGNodeArray[0].position.y + BGNodeArray[0].size.height/2) < sceneHeight {
-        returnPoint.y = sceneHeight - (BGNodeArray[0].position.y + BGNodeArray[0].size.height/2)
+        
         BGNodeArray[0].position.y = sceneHeight - BGNodeArray[0].size.height/2
         for index in stride (from: numberOfTilesInRow, through:(numberOfTilesInColumn*(numberOfTilesInRow-1)), by: numberOfTilesInColumn) {
             BGNodeArray[index].position.y = BGNodeArray[index-numberOfTilesInColumn].position.y - BGNodeArray[index-numberOfTilesInColumn].size.height
@@ -270,7 +270,7 @@ func zoomCorrectNodes (BGNodeArray: Array<SKSpriteNode>, sceneWidth: CGFloat, sc
         
     }
     if (BGNodeArray[BGNodeArray.count-1].position.x + BGNodeArray[BGNodeArray.count-1].size.width/2) < sceneWidth {
-        returnPoint.x = sceneWidth - (BGNodeArray[BGNodeArray.count-1].position.x + BGNodeArray[BGNodeArray.count-1].size.width/2)
+        
         BGNodeArray[BGNodeArray.count-1].position.x = sceneWidth - BGNodeArray[BGNodeArray.count-1].size.width/2
         for index in stride (from:(BGNodeArray.count-2), through: (BGNodeArray.count-numberOfTilesInRow), by: -1) {
             BGNodeArray[index].position.x = BGNodeArray[index+1].position.x - BGNodeArray[index+1].size.width
@@ -281,7 +281,7 @@ func zoomCorrectNodes (BGNodeArray: Array<SKSpriteNode>, sceneWidth: CGFloat, sc
         
     }
     if (BGNodeArray[BGNodeArray.count-1].position.y - (BGNodeArray[BGNodeArray.count-1].size.height)/2) > 0 {
-        returnPoint.y = BGNodeArray[BGNodeArray.count-1].position.y - (BGNodeArray[BGNodeArray.count-1].size.height)/2
+        
         BGNodeArray[BGNodeArray.count-1].position.y = BGNodeArray[BGNodeArray.count-1].size.height/2
         for index in stride(from: (BGNodeArray.count-1-numberOfTilesInRow), through: (numberOfTilesInRow-1), by: (-1*numberOfTilesInRow)) {
           BGNodeArray[index].position.y = BGNodeArray[index+numberOfTilesInRow].position.y + BGNodeArray[index+numberOfTilesInRow].size.height
@@ -295,7 +295,7 @@ func zoomCorrectNodes (BGNodeArray: Array<SKSpriteNode>, sceneWidth: CGFloat, sc
         
         
     }
-    return returnPoint
+    
 }
 //**************************************************************************************************************************************
 //**************************************************************************************************************************************

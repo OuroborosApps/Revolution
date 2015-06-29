@@ -45,6 +45,10 @@ class level2 :SKScene {
     let planet2 = planet(imageNamed: "planet")
     let gravityField = SKFieldNode.radialGravityField()
     
+    // Some variales for the star positioning
+    var afterSet = false
+    var referenceDistance = CGPointMake(0, 0)
+    
     
     //**************Tiled Background Nodes*************************
     
@@ -142,18 +146,14 @@ class level2 :SKScene {
         //*******************************************************************************************
         //**************************Zooming Movement for Stars and Planets Below*********************
         //*******************************************************************************************
-        moveSpriteNodeWithPinch(star1, touchedPoint, gesture)
+        referenceDistance = scaleSpriteNodePositionWithPinch(gesture, referenceDistance, bgTile1)
         
         //*******************************************************************************************
         //**************************Zooming Correction for Background Nodes**************************
         //*******************************************************************************************
-        var returnPoint = zoomCorrectNodes(BGNodeArray, sceneWidth, sceneHeight, numberOfTilesInRow, numberOfTilesInColumn)
+        zoomCorrectNodes(BGNodeArray, sceneWidth, sceneHeight, numberOfTilesInRow, numberOfTilesInColumn)
         
-        if BGNodeArray[0].size.width > minTileWidth {
-            moveSpriteNodeWithEdgeCorrection(star1,returnPoint)
-        }
-        println(returnPoint)
-        println(star1.position)
+        
         
         
         gesture.scale = 1
@@ -210,9 +210,6 @@ class level2 :SKScene {
             bgTile14.position = convertPointFromView(CGPointMake(convertPointToView(bgTile14.position).x+deltaPoint.x, convertPointToView(bgTile14.position).y+deltaPoint.y))
             bgTile15.position = convertPointFromView(CGPointMake(convertPointToView(bgTile15.position).x+deltaPoint.x, convertPointToView(bgTile15.position).y+deltaPoint.y))
             bgTile16.position = convertPointFromView(CGPointMake(convertPointToView(bgTile16.position).x+deltaPoint.x, convertPointToView(bgTile16.position).y+deltaPoint.y))
-            //***********************************************************************************************************************************//
-            //***************************************Panning Movement For Stars and Planets Below************************************************//
-            //***********************************************************************************************************************************//
             
             
             //***********************************************************************************************************************************//
@@ -267,6 +264,9 @@ class level2 :SKScene {
         //******************************************************************************************
         oldPosition = bgTile1.position
         
+        
+        
+        
         self.physicsWorld.gravity = CGVectorMake(0, 0)
         
         let radius = star1.size.width / 2
@@ -291,7 +291,10 @@ class level2 :SKScene {
         star1.physicsBody?.collisionBitMask = PhysicsCategory.star
         addChild(star1)
         
-        
+        //*********************Variables For Keeping the Star in Place During Zooming and Panning*******
+        referenceDistance = CGPointMake(bgTile1.position.x - star1.position.x, bgTile1.position.y - star1.position.y)
+        afterSet = true
+        //**********************************************************************************************
         
         //Creating the Planet
         
@@ -492,6 +495,13 @@ class level2 :SKScene {
         oldPosition = bgTile1.position
         //***
         //*******************************************************************************************************
+        // This is the function for keeping the star in position during zooming and panning
+        if afterSet {
+            star1.position.x = bgTile1.position.x - referenceDistance.x
+            star1.position.y = bgTile1.position.y - referenceDistance.y
+        }
+        
+        
         
     }
 //***********************************************************************************************************************************************
