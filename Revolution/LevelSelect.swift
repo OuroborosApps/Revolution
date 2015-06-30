@@ -250,6 +250,8 @@ class levelSelect :SKScene {
                 
                     let reveal = SKTransition.crossFadeWithDuration(0.5)
                     let level3Size = CGSizeMake(1334, 750)
+                    self.view?.removeGestureRecognizer(rightSwipeRecognizer!)
+                    self.view?.removeGestureRecognizer(leftSwipeRecognizer!)
                     let level3Scene = level3(size: level3Size)
                     self.view?.presentScene(level3Scene, transition: reveal)
                 

@@ -26,8 +26,8 @@ class level2 :SKScene {
     let maxTileHeight: CGFloat = 750
     let minTileWidth: CGFloat = 334
     let minTileHeight: CGFloat = 188
-    let minScale: CGFloat = 0.75
-    let maxScale: CGFloat = 1.25
+    let minScale: CGFloat = 0.90
+    let maxScale: CGFloat = 1.10
     let numberOfTilesInRow: Int = 4
     let numberOfTilesInColumn: Int = 4
     var centerNode: SKNode?
@@ -37,6 +37,8 @@ class level2 :SKScene {
     
     var hasBeenStopped = false
     var updateDisp = true
+    
+    var fullyZoomedIn = true
     
     var oldPosition: CGPoint?
     
@@ -106,7 +108,17 @@ class level2 :SKScene {
             var centerNodeArray = nodesAtPoint(touchedPoint)
             centerNode = findCenterNode(centerNodeArray)!
             
+            if gesture.scale < 1 {
+                fullyZoomedIn = false
+            }
+            
+
         }
+        
+        if gesture.scale < 1 {
+            fullyZoomedIn = false
+        }
+        
         //*******************************************************************************************
         // ***Finding the distance between the touchedPoint and the center of the center Node***
         var xDisp = touchedPoint.x - centerNode!.position.x
@@ -131,7 +143,7 @@ class level2 :SKScene {
         //**********************************************************************************************************************
         //***********Failsafe : Corrects if the scale function overshoots the scaling for either zoom in or zoom out************
         //**********************************************************************************************************************
-        failsafeZoom(BGNodeArray, minTileWidth, minTileHeight, maxTileWidth, maxTileHeight)
+        
         //*******************************************************************************************
         // *Weird but only method I could think of for calling the function to center the zoom on a specific node !!! This will fail if the nodes are renamed!!!*
         //*******************************************************************************************
@@ -142,7 +154,9 @@ class level2 :SKScene {
         //*******************************************************************************************
         //**************************Zooming Movement for Background Nodes****************************
         //*******************************************************************************************
-        zoomCenteredOnTile(selectedNode, BGNodeArray, Double(numberOfTilesInRow), Double(numberOfTilesInColumn), touchedPoint, scaledXDisp, scaledYDisp)
+        zoomCenteredOnTile(selectedNode, BGNodeArray, Double(numberOfTilesInRow), Double(numberOfTilesInColumn), touchedPoint, scaledXDisp, scaledYDisp, fullyZoomedIn)
+        
+        failsafeZoom(BGNodeArray, minTileWidth, minTileHeight, maxTileWidth, maxTileHeight)
         //*******************************************************************************************
         //**************************Zooming Movement for Stars and Planets Below*********************
         //*******************************************************************************************
@@ -153,7 +167,9 @@ class level2 :SKScene {
         //*******************************************************************************************
         zoomCorrectNodes(BGNodeArray, sceneWidth, sceneHeight, numberOfTilesInRow, numberOfTilesInColumn)
         
-        
+        if bgTile1.size.width == maxTileWidth {
+            fullyZoomedIn = true
+        }
         
         
         gesture.scale = 1
@@ -355,7 +371,7 @@ class level2 :SKScene {
 //*************************************************************************************************************************************************
 //*************************************************Background Update Functions*********************************************************************
 //*************************************************************************************************************************************************
-        // Below also needs to be added a function to maintain all non-background nodes at the same relative position to the background, preferably without assigning a velocity to these nodes
+        
         
         if bgTile1.physicsBody?.velocity.dx != 0 || bgTile1.physicsBody?.velocity.dy != 0 {
             followTile(BGNodeArray)
