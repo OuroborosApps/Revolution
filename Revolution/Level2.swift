@@ -102,17 +102,17 @@ class level2 :SKScene {
         // Finds the midpoint location of the pinch gesture
         var gesturePoint = gesture.locationInView(self.view)
         var touchedPoint = convertPointFromView(gesturePoint)
-       
+        var centerNodeArray = nodesAtPoint(touchedPoint)
+        centerNode = findCenterNode(centerNodeArray)!
         if gesture.state == UIGestureRecognizerState.Began{
             updateDisp = false
-            var centerNodeArray = nodesAtPoint(touchedPoint)
-            centerNode = findCenterNode(centerNodeArray)!
+            
             
             if gesture.scale < 1 {
                 fullyZoomedIn = false
             }
             
-
+            
         }
         
         if gesture.scale < 1 {
@@ -123,12 +123,16 @@ class level2 :SKScene {
         // ***Finding the distance between the touchedPoint and the center of the center Node***
         var xDisp = touchedPoint.x - centerNode!.position.x
         var yDisp = touchedPoint.y - centerNode!.position.y
-        var scaledXDisp: CGFloat = xDisp * gesture.scale
-        var scaledYDisp: CGFloat = yDisp * gesture.scale
+        
+        
         //*******************************************************************************************
         //********************************Correct the Zooming****************************************
         //*******************************************************************************************
+        
         limitZooming(bgTile1, gesture, maxTileWidth, minTileWidth, minScale, maxScale)
+        
+        var scaledXDisp: CGFloat = xDisp * gesture.scale
+        var scaledYDisp: CGFloat = yDisp * gesture.scale
         
         //*******************************************************************************************
         //*****************Scaling Functions for the background nodes********************************
@@ -157,6 +161,7 @@ class level2 :SKScene {
         zoomCenteredOnTile(selectedNode, BGNodeArray, Double(numberOfTilesInRow), Double(numberOfTilesInColumn), touchedPoint, scaledXDisp, scaledYDisp, fullyZoomedIn)
         
         failsafeZoom(BGNodeArray, minTileWidth, minTileHeight, maxTileWidth, maxTileHeight)
+        
         //*******************************************************************************************
         //**************************Zooming Movement for Stars and Planets Below*********************
         //*******************************************************************************************
@@ -165,7 +170,7 @@ class level2 :SKScene {
         //*******************************************************************************************
         //**************************Zooming Correction for Background Nodes**************************
         //*******************************************************************************************
-        zoomCorrectNodes(BGNodeArray, sceneWidth, sceneHeight, numberOfTilesInRow, numberOfTilesInColumn)
+        
         
         if bgTile1.size.width == maxTileWidth {
             fullyZoomedIn = true
@@ -371,7 +376,7 @@ class level2 :SKScene {
 //*************************************************************************************************************************************************
 //*************************************************Background Update Functions*********************************************************************
 //*************************************************************************************************************************************************
-        
+        zoomCorrectNodes(BGNodeArray, sceneWidth, sceneHeight, numberOfTilesInRow, numberOfTilesInColumn)
         
         if bgTile1.physicsBody?.velocity.dx != 0 || bgTile1.physicsBody?.velocity.dy != 0 {
             followTile(BGNodeArray)

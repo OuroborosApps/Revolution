@@ -68,7 +68,6 @@
 		27DF96F81A1998C1008AFFE7 /* GameViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 27DF96F71A1998C1008AFFE7 /* GameViewController.swift */; };
 		27DF96FB1A1998C1008AFFE7 /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 27DF96F91A1998C1008AFFE7 /* Main.storyboard */; };
 		27DF96FD1A1998C1008AFFE7 /* Images.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 27DF96FC1A1998C1008AFFE7 /* Images.xcassets */; };
-		27DF97001A1998C1008AFFE7 /* LaunchScreen.xib in Resources */ = {isa = PBXBuildFile; fileRef = 27DF96FE1A1998C1008AFFE7 /* LaunchScreen.xib */; };
 		27DF970C1A1998C1008AFFE7 /* RevolutionTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 27DF970B1A1998C1008AFFE7 /* RevolutionTests.swift */; };
 		27DF97161A1999A4008AFFE7 /* Star.swift in Sources */ = {isa = PBXBuildFile; fileRef = 27DF97151A1999A4008AFFE7 /* Star.swift */; };
 		27DF97181A19A372008AFFE7 /* Planet.swift in Sources */ = {isa = PBXBuildFile; fileRef = 27DF97171A19A372008AFFE7 /* Planet.swift */; };
@@ -148,7 +147,6 @@
 		27DF96F71A1998C1008AFFE7 /* GameViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GameViewController.swift; sourceTree = "<group>"; };
 		27DF96FA1A1998C1008AFFE7 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/Main.storyboard; sourceTree = "<group>"; };
 		27DF96FC1A1998C1008AFFE7 /* Images.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Images.xcassets; sourceTree = "<group>"; };
-		27DF96FF1A1998C1008AFFE7 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = Base; path = Base.lproj/LaunchScreen.xib; sourceTree = "<group>"; };
 		27DF97051A1998C1008AFFE7 /* RevolutionTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = RevolutionTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		27DF970A1A1998C1008AFFE7 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		27DF970B1A1998C1008AFFE7 /* RevolutionTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RevolutionTests.swift; sourceTree = "<group>"; };
@@ -266,7 +264,6 @@
 				27DF96F71A1998C1008AFFE7 /* GameViewController.swift */,
 				27DF96F91A1998C1008AFFE7 /* Main.storyboard */,
 				27DF96FC1A1998C1008AFFE7 /* Images.xcassets */,
-				27DF96FE1A1998C1008AFFE7 /* LaunchScreen.xib */,
 				27DF96EF1A1998C1008AFFE7 /* Supporting Files */,
 			);
 			path = Revolution;
@@ -378,7 +375,6 @@
 			buildActionMask = 2147483647;
 			files = (
 				2744D7151A1D92BE00457231 /* stainless-steel.png in Resources */,
-				27DF97001A1998C1008AFFE7 /* LaunchScreen.xib in Resources */,
 				277775AB1A3E721B00AAE5B1 /* HDHR_Space_BG2.png in Resources */,
 				2777759E1A3E721B00AAE5B1 /* HDHR_Space_BG8.png in Resources */,
 				277775A11A3E721B00AAE5B1 /* HDHR_Space_BG14.png in Resources */,
@@ -486,14 +482,6 @@
 				27DF96FA1A1998C1008AFFE7 /* Base */,
 			);
 			name = Main.storyboard;
-			sourceTree = "<group>";
-		};
-		27DF96FE1A1998C1008AFFE7 /* LaunchScreen.xib */ = {
-			isa = PBXVariantGroup;
-			children = (
-				27DF96FF1A1998C1008AFFE7 /* Base */,
-			);
-			name = LaunchScreen.xib;
 			sourceTree = "<group>";
 		};
 /* End PBXVariantGroup section */
