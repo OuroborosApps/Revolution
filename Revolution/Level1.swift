@@ -34,12 +34,14 @@ class level1 :SKScene {
     let tracer2 = tracer(imageNamed: "tracer")
     let shapeNodePath1 = SKShapeNode()
     let shapeNodePath2 = SKShapeNode()
+    
     var tracer1Red = false
-    var tracer2Red = false
     var tracer1Done = false
-    var tracer2Done = false
     var tracer1Flash = false
-    var tracer2Flash = false
+    var tracer1Count = -1
+    var tracer1Turn = false
+    var tracer1Speed: (CGFloat) = 0
+    
     var flash = UInt32(1)
     let gravityField1 = SKFieldNode.radialGravityField()
     let gravityField2 = SKFieldNode.radialGravityField()
@@ -85,7 +87,7 @@ class level1 :SKScene {
         gravityField1b.enabled = true;
         gravityField1b.position = CGPoint(x: self.size.width / 3, y: self.size.height / 2)
         //gravityField1b.strength = Float(pow(radius1, 2)) * pow(10, -3) * 100
-        gravityField1b.strength = Float(pow(radius1, 2)) * pow(10, -3) * 4
+        gravityField1b.strength = Float(pow(radius1, 2)) * pow(10, -3) * 9
         gravityField1b.categoryBitMask = tracerCat
         
         addChild(gravityField1b)
@@ -149,13 +151,12 @@ class level1 :SKScene {
         planet2.zPosition = 2
         planet2.name = "planet2"
         
-        addChild(planet2)
+        //addChild(planet2)
         
         //Tracer draws future path of the planets
         tracer1.physicsBody?.friction = 0
         tracer1.position = planet1.position
-        //tracer1.physicsBody?.velocity = CGVectorMake(0, 2000)
-        tracer1.physicsBody?.velocity = CGVectorMake(0, 400)
+        tracer1.physicsBody?.velocity = CGVectorMake(0, 600)
         tracer1.physicsBody?.linearDamping = 0
         tracer1.physicsBody?.angularDamping = 0
         tracer1.physicsBody?.angularVelocity = 0
@@ -169,7 +170,6 @@ class level1 :SKScene {
         //Tracer draws future path of the planets
         tracer2.physicsBody?.friction = 0
         tracer2.position = planet2.position
-        //tracer2.physicsBody?.velocity = CGVectorMake(0, 2000)
         tracer2.physicsBody?.velocity = CGVectorMake(0, -400)
         tracer2.physicsBody?.linearDamping = 0
         tracer2.physicsBody?.angularDamping = 0
@@ -179,7 +179,7 @@ class level1 :SKScene {
         tracer2.zPosition = 2
         tracer2.name = "tracer2"
         
-        addChild(tracer2)
+        //addChild(tracer2)
         
         //prevents stars from being pushed by planets, won't matter when collision ends game
         star1.physicsBody?.mass = 10000
@@ -210,6 +210,7 @@ class level1 :SKScene {
             selectedNode = node as? SKSpriteNode;
             selectedNode?.physicsBody?.velocity = CGVectorMake(0,0)
             spin = selectedNode?.physicsBody?.angularVelocity
+            
             selectedNode?.physicsBody?.dynamic = false
             history = [TouchInfo(location:location, time:touch.timestamp)]
         }
@@ -238,7 +239,6 @@ class level1 :SKScene {
             var dy: CGFloat = 0.0
             var frames = CGFloat(1)
             tracer1Flash = false
-            tracer2Flash = false
         
             if (selectedNode != nil && history!.count > 1) {
 
@@ -246,8 +246,9 @@ class level1 :SKScene {
                 var previousTouchInfo: TouchInfo?
                 // Adjust this value for more smoothening
                 let iterations = 3
-                // Maximum time object can sit still before setting velocity to 0
-                let maxTime = CGFloat(0.035)
+                
+                // Maximum time object can sit still before setting velocity to 0, needs to be tested on real phones
+                let maxTime = CGFloat(0.02)
                 var numElts: Int = min(history!.count, iterations)
                 for index in 0...numElts-1 {
                     let touchInfo = history![numElts-index-1]
@@ -282,7 +283,7 @@ class level1 :SKScene {
             
                 tracer1.physicsBody?.friction = 0
                 tracer1.position = planet1.position
-                tracer1.physicsBody?.velocity = CGVectorMake(2 * xVelocity/frames, 2 * yVelocity/frames)
+                tracer1.physicsBody?.velocity = CGVectorMake(3 * xVelocity/frames, 3 * yVelocity/frames)
                 tracer1.physicsBody?.linearDamping = 0
                 tracer1.physicsBody?.angularDamping = 0
                 tracer1.physicsBody?.angularVelocity = 0
@@ -292,29 +293,10 @@ class level1 :SKScene {
                 tracer1.name = "tracer"
                 tracer1Red = false
                 tracer1Done = false
+                tracer1Turn = false
                 
                 addChild(tracer1)
                 tracer1Path = [CGPoint(x:0, y:0)]
-            }
-            
-            if node.name == "planet2" {
-                tracer2.removeFromParent()
-                
-                tracer2.physicsBody?.friction = 0
-                tracer2.position = planet2.position
-                tracer2.physicsBody?.velocity = CGVectorMake(2 * xVelocity/frames, 2 * yVelocity/frames)
-                tracer2.physicsBody?.linearDamping = 0
-                tracer2.physicsBody?.angularDamping = 0
-                tracer2.physicsBody?.angularVelocity = 0
-                
-                tracer2.physicsBody?.fieldBitMask = tracerCat
-                tracer2.zPosition = 1
-                tracer2.name = "tracer"
-                tracer2Red = false
-                tracer2Done = false
-                
-                addChild(tracer2)
-                tracer2Path = [CGPoint(x:0, y:0)]
             }
                 
             let velocity = CGVectorMake(xVelocity/frames,yVelocity/frames)
@@ -360,27 +342,6 @@ class level1 :SKScene {
         return orbitPath1
     }
     
-    func createOrbitPath2() -> CGPathRef? {
-        
-        if tracer2Path.count <= 2 {
-            return nil
-        }
-        
-        var orbitPath2 = CGPathCreateMutable()
-        
-        for var i = 0; i < tracer2Path.count-1; ++i {
-            let p = tracer2Path[i]
-            
-            if i == 0 {
-                CGPathMoveToPoint(orbitPath2, nil, p.x, p.y)
-            } else {
-                CGPathAddLineToPoint(orbitPath2, nil, p.x, p.y)
-            }
-        }
-        
-        return orbitPath2
-    }
-    
     func drawOrbit1() {
         
         enumerateChildNodesWithName("line1", usingBlock: {node, stop in
@@ -405,37 +366,9 @@ class level1 :SKScene {
         
         self.addChild(shapeNodePath1)
         
+        //Need condition to start flashing
         if tracer1Flash == false && 1==0 {
             tracer1Flash = true
-            tracer2Flash = true
-        }
-    }
-    
-    func drawOrbit2() {
-        
-        enumerateChildNodesWithName("line2", usingBlock: {node, stop in
-            node.removeFromParent()
-        })
-
-        shapeNodePath2.path = self.createOrbitPath2()
-        shapeNodePath2.name = "line2"
-        if self.tracer2Flash == true && self.flash > 5 {
-            shapeNodePath2.strokeColor = UIColor.redColor()
-        } else if self.tracer2Red == true {
-            shapeNodePath2.strokeColor = UIColor.redColor()
-        } else if self.tracer2Done == true {
-            shapeNodePath2.strokeColor = UIColor.greenColor()
-        } else {
-            shapeNodePath2.strokeColor = UIColor.whiteColor()
-        }
-        shapeNodePath2.lineWidth = 4
-        shapeNodePath2.zPosition = 1
-            
-        self.addChild(shapeNodePath2)
-        
-        if tracer2Flash == false && 1==0 {
-            tracer1Flash = true
-            tracer2Flash = true
         }
     }
     
@@ -450,14 +383,37 @@ class level1 :SKScene {
             flash = 1;
         }
 
-        if !tracer1Done {
+        if tracer1Count >= 0 {
+            
+            if tracer1Count == 0 {
+                tracer1Done = true;
+                tracer1.removeFromParent()
+                tracer1Count = -1
+                drawOrbit1()
+            } else {
+                tracer1Path.insert(tracer1.position, atIndex:0)
+                tracer1Count -= 1
+                drawOrbit1()
+            }
+            
+        } else if !tracer1Done {
             
             tracer1Path.insert(tracer1.position, atIndex:0)
+            
+            if tracer1Turn == false {
+                tracer1Speed = sqrt(tracer1.physicsBody!.velocity.dx*tracer1.physicsBody!.velocity.dx +
+                    tracer1.physicsBody!.velocity.dy*tracer1.physicsBody!.velocity.dy)
+            }
             
             if tracer1.position.x > self.size.width || tracer1.position.y > self.size.height || tracer1.position.x < 0 || tracer1.position.y < 0 {
                 tracer1Red = true
                 tracer1Done = true
                 tracer1.removeFromParent()
+            }
+            
+            //may need to be adjusted for lager space
+            if tracer1Speed < 50 {
+                tracer1Turn = true
             }
             
             let distance1star = pow((tracer1.position.x - star1.position.x),2) +
@@ -472,46 +428,13 @@ class level1 :SKScene {
             let distance1 = pow((tracer1.position.x - tracer1Path[num1 - 2].x),2) +
                 pow((tracer1.position.y - tracer1Path[num1 - 2].y),2)
             
-            if tracer1Path.count > 10 && distance1 < 200 {
-                tracer1Done = true
-                tracer1.removeFromParent()
+            if tracer1Path.count > 20 && distance1 < 400 && tracer1Turn == false {
+                tracer1Count = Int(800 / tracer1Speed)
             }
             drawOrbit1()
         
         } else if tracer1Flash == true {
             drawOrbit1()
-        }
-        
-        if !tracer2Done {
-            
-            tracer2Path.insert(tracer2.position, atIndex:0)
-            
-            if tracer2.position.x > self.size.width || tracer2.position.y > self.size.height || tracer2.position.x < 0 || tracer2.position.y < 0 {
-                tracer2Red = true
-                tracer2Done = true
-                tracer2.removeFromParent()
-            }
-            
-            let distance2star = pow((tracer2.position.x - star1.position.x),2) +
-                pow((tracer2.position.y - star1.position.y),2)
-            if distance2star < pow(star1.size.width * 0.8,2) {
-                tracer2Red = true
-                tracer2Done = true
-                tracer2.removeFromParent()
-            }
-            
-            let num2 = max(tracer2Path.count, 2)
-            let distance2 = pow((tracer2.position.x - tracer2Path[num2 - 2].x),2) +
-                pow((tracer2.position.y - tracer2Path[num2 - 2].y),2)
-            
-            if tracer2Path.count > 10 && distance2 < 200 {
-                tracer2Done = true
-                tracer2.removeFromParent()
-            }
-            drawOrbit2()
-
-        } else if tracer2Flash == true {
-            drawOrbit2()
         }
     }
 }
